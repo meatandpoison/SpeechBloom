@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Learning Buddy · All Subjects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#26304f;--mute:#6b7393;--card:#fff;--shadow:rgba(38,48,79,.16);--good:#27c281;--bad:#ff5d6c;--accent:#7c5cff;--accent2:#5e3ff0;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{font-family:'Nunito',sans-serif;color:var(--ink);min-height:100dvh;overflow-x:hidden;user-select:none;
+    background:radial-gradient(circle at 15% 8%,#e7e0ff 0%,transparent 42%),radial-gradient(circle at 88% 12%,#d8f3ff 0%,transparent 40%),linear-gradient(180deg,#f3f1ff 0%,#eafaf5 100%);}
+  .app{position:relative;z-index:1;max-width:620px;margin:0 auto;padding:14px 14px 40px;min-height:100dvh;display:flex;flex-direction:column;}
+  header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .logo{width:50px;height:50px;background:var(--card);border-radius:16px;display:grid;place-items:center;font-size:26px;box-shadow:0 5px 0 var(--shadow);}
+  .title h1{font-size:18px;font-weight:900;line-height:1.05;}
+  .title p{font-weight:700;font-size:11px;color:var(--mute);}
+  .hud{display:flex;gap:7px;align-items:center;}
+  .pill{background:var(--card);border-radius:13px;padding:6px 10px;font-weight:900;font-size:13px;box-shadow:0 4px 0 var(--shadow);display:flex;align-items:center;gap:4px;cursor:pointer;}
+  .screen{flex:1;display:none;flex-direction:column;animation:pop .26s ease;}
+  .screen.show{display:flex;}
+  @keyframes pop{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .greet{text-align:center;font-weight:900;font-size:18px;margin:6px 0 14px;}
+  .menu{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .tile{border:none;cursor:pointer;border-radius:22px;padding:20px 12px;color:#fff;font-family:'Nunito';font-weight:900;text-align:center;box-shadow:0 7px 0 var(--shadow);transition:transform .12s,box-shadow .12s;display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .tile:active{transform:translateY(5px);box-shadow:0 2px 0 var(--shadow);}
+  .tile .emoji{font-size:40px;} .tile .nm{font-size:17px;} .tile .zh{font-family:'Noto Sans SC';font-size:14px;opacity:.95;}
+  .t-cn{background:linear-gradient(155deg,#ff6b9d,#c44b8a);}
+  .t-en{background:linear-gradient(155deg,#4aa3ff,#2f6bff);}
+  .t-ma{background:linear-gradient(155deg,#8b5cf6,#5e3ff0);}
+  .t-sc{background:linear-gradient(155deg,#16c4a8,#0e9e87);}
+  .t-sp{background:linear-gradient(155deg,#ff8a3d,#ff6b6b);grid-column:span 2;}
+  .t-pr{background:linear-gradient(155deg,#ffc233,#ff9a1f);color:#26304f;grid-column:span 2;}
+  .back{align-self:flex-start;border:none;cursor:pointer;background:var(--card);border-radius:16px;padding:8px 14px;font-family:'Nunito';font-weight:800;font-size:14px;color:var(--ink);box-shadow:0 4px 0 var(--shadow);margin-bottom:10px;}
+  .back:active{transform:translateY(3px);}
+  .lead{font-weight:800;font-size:14px;color:var(--mute);margin-bottom:10px;}
+  .lead b{color:var(--accent2);}
+  .sub-head{text-align:center;font-weight:900;font-size:20px;margin-bottom:14px;}
+  .act-list{display:flex;flex-direction:column;gap:10px;}
+  .act{border:none;cursor:pointer;background:var(--card);border-radius:18px;padding:16px;font-family:'Nunito';font-weight:900;font-size:16px;color:var(--ink);box-shadow:0 5px 0 var(--shadow);display:flex;align-items:center;gap:12px;text-align:left;}
+  .act:active{transform:translateY(3px);}
+  .act .ic{font-size:28px;} .act .d{font-size:11px;font-weight:700;color:var(--mute);}
+  .qcard{background:var(--card);border-radius:24px;padding:20px;box-shadow:0 9px 0 var(--shadow);}
+  .feedback{text-align:center;font-weight:900;font-size:16px;min-height:24px;margin-top:8px;}
+  .good{color:var(--good);} .bad{color:var(--bad);}
+  .action-btn{border:none;cursor:pointer;border-radius:16px;padding:11px 18px;font-family:'Nunito';font-weight:900;font-size:15px;color:#fff;box-shadow:0 5px 0 var(--shadow);transition:transform .1s;}
+  .action-btn:active{transform:translateY(4px);}
+  .b-go{background:var(--accent);} .b-clear{background:var(--bad);} .b-next{background:var(--accent2);} .b-ok{background:var(--good);}
+  .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;align-items:center;}
+  .topic-bar{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 9px;scrollbar-width:none;}
+  .topic-bar::-webkit-scrollbar{display:none;}
+  .chip{flex:0 0 auto;border:none;cursor:pointer;background:var(--card);border-radius:16px;padding:8px 13px;font-family:'Nunito';font-weight:800;font-size:13px;color:var(--ink);box-shadow:0 3px 0 var(--shadow);}
+  .chip.active{background:var(--accent);color:#fff;}
+  .chip.zh{font-family:'Noto Sans SC';font-weight:900;font-size:20px;}
+  /* flashcard */
+  .flash{width:100%;max-width:330px;margin:0 auto;aspect-ratio:3/3.3;background:var(--card);border-radius:30px;box-shadow:0 11px 0 var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;}
+  .flash .pic{font-size:88px;animation:bob 2.6s ease-in-out infinite;}
+  @keyframes bob{50%{transform:translateY(-8px);}}
+  .flash .front{font-family:'Noto Sans SC';font-weight:900;font-size:54px;}
+  .flash .front.en{font-family:'Nunito';font-size:38px;}
+  .flash .py{font-weight:800;font-size:22px;color:var(--accent);}
+  .flash .back{font-weight:800;font-size:18px;color:var(--mute);display:none;text-align:center;padding:0 16px;}
+  .flash.flip .back{display:block;}
+  .counter{font-weight:900;font-size:15px;color:var(--mute);}
+  .speak-btn{border:none;cursor:pointer;background:var(--accent);width:64px;height:64px;border-radius:50%;font-size:28px;box-shadow:0 5px 0 var(--shadow);color:#fff;display:grid;place-items:center;position:relative;}
+  .speak-btn:active{transform:translateY(4px);}
+  .speak-btn.slow{background:var(--good);}
+  .speak-btn .x3{position:absolute;bottom:2px;right:6px;font-size:12px;font-weight:900;}
+  .nav-btn{border:none;cursor:pointer;background:var(--card);width:52px;height:52px;border-radius:50%;font-size:24px;font-weight:900;box-shadow:0 5px 0 var(--shadow);color:var(--ink);}
+  .nav-btn:active{transform:translateY(4px);}
+  /* mcq */
+  .qpic{font-size:74px;text-align:center;}
+  .qtext{font-weight:800;font-size:16px;text-align:center;line-height:1.4;margin-top:6px;}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+  .opt{border:none;cursor:pointer;background:#f6f8ff;border-radius:16px;padding:16px 8px;font-family:'Nunito';font-weight:900;font-size:16px;color:var(--ink);box-shadow:0 5px 0 var(--shadow);}
+  .opt.cn{font-family:'Noto Sans SC';font-size:26px;}
+  .opt:active{transform:translateY(3px);}
+  .opt.correct{background:var(--good);color:#fff;} .opt.wrong{background:var(--bad);color:#fff;}
+  /* drag */
+  .dropzone{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:72px;background:#f4f6ff;border:3px dashed #c7cffb;border-radius:18px;padding:12px;align-items:center;}
+  .dropzone.over{background:#e7ecff;border-color:var(--accent);}
+  .bank{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
+  .tile-d{border:none;cursor:grab;background:var(--card);border-radius:16px;padding:12px 16px;font-weight:900;font-size:24px;color:var(--ink);box-shadow:0 5px 0 var(--shadow);display:flex;flex-direction:column;align-items:center;line-height:1.1;touch-action:none;}
+  .tile-d.zh{font-family:'Noto Sans SC';font-size:26px;}
+  .tile-d .py{font-family:'Nunito';font-weight:700;font-size:12px;color:var(--accent);}
+  .tile-d.placed{background:var(--accent);color:#fff;} .tile-d.placed .py{color:#fff;}
+  .tile-d.used{visibility:hidden;}
+  .eqslot{min-width:56px;min-height:56px;border:3px dashed #c7cffb;border-radius:14px;display:grid;place-items:center;font-size:30px;font-weight:900;color:var(--accent);background:#f4f6ff;}
+  .eqslot.filled{background:var(--accent);color:#fff;border-style:solid;}
+  .eqrow{display:flex;align-items:center;justify-content:center;gap:8px;font-size:32px;font-weight:900;margin:10px 0;}
+  /* keypad */
+  .eq{text-align:center;font-size:44px;font-weight:900;letter-spacing:2px;margin:8px 0;}
+  .eq .slot{display:inline-block;min-width:54px;border-bottom:5px solid var(--accent);color:var(--accent);}
+  .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:270px;margin:12px auto 0;}
+  .key{border:none;cursor:pointer;background:#f1f4ff;border-radius:14px;padding:15px;font-family:'Nunito';font-weight:900;font-size:22px;color:var(--ink);box-shadow:0 4px 0 var(--shadow);}
+  .key:active{transform:translateY(3px);} .key.go{background:var(--good);color:#fff;} .key.del{background:var(--bad);color:#fff;font-size:16px;}
+  /* bond */
+  .bond{display:flex;flex-direction:column;align-items:center;gap:18px;margin:14px 0;}
+  .whole{width:78px;height:78px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:32px;font-weight:900;box-shadow:0 5px 0 var(--shadow);}
+  .legs{display:flex;gap:40px;}
+  .part{width:66px;height:66px;border-radius:50%;display:grid;place-items:center;font-size:28px;font-weight:900;color:#fff;box-shadow:0 5px 0 var(--shadow);}
+  .part.a{background:#2fd3a5;} .part.b{background:#ff8a3d;} .part.q{background:#fff;color:var(--accent);border:3px dashed var(--accent);box-shadow:none;}
+  /* tone */
+  .tone-card{background:#fff;border-radius:24px;padding:20px;box-shadow:0 8px 0 var(--shadow);text-align:center;}
+  .tone-num{font-weight:900;font-size:17px;color:#fff;border-radius:16px;padding:4px 14px;display:inline-block;margin-bottom:6px;}
+  .tone-shape{font-size:64px;font-weight:900;line-height:1;}
+  .tone-name{font-weight:900;font-size:20px;}
+  .tone-desc{font-weight:700;font-size:14px;color:var(--mute);margin-top:4px;}
+  .tone-ex{margin-top:12px;display:flex;align-items:center;justify-content:center;gap:14px;background:#f6f8ff;border-radius:16px;padding:12px;}
+  .tone-ex .pic{font-size:44px;} .tone-ex .hz{font-family:'Noto Sans SC';font-weight:900;font-size:34px;}
+  .tone-ex .py{font-weight:800;font-size:17px;color:var(--accent);} .tone-ex .en{font-weight:700;font-size:13px;color:var(--mute);}
+  .dots{display:flex;gap:7px;justify-content:center;margin-bottom:10px;}
+  .dots .d{width:12px;height:12px;border-radius:50%;background:#cdd5f5;} .dots .d.on{background:var(--accent);}
+  /* stroke */
+  .pad{position:relative;width:280px;height:280px;max-width:78vw;max-height:78vw;margin:0 auto;background:#fff;border-radius:24px;box-shadow:0 8px 0 var(--shadow);touch-action:none;}
+  .pad .guide{position:absolute;inset:0;display:grid;place-items:center;font-family:'Noto Sans SC';font-weight:900;font-size:190px;color:rgba(124,92,255,.12);pointer-events:none;}
+  .pad .gl{position:absolute;background:rgba(124,92,255,.2);}
+  .pad .glv{left:50%;top:0;bottom:0;width:2px;} .pad .glh{top:50%;left:0;right:0;height:2px;}
+  .pad canvas{position:absolute;inset:0;border-radius:24px;}
+  /* speech */
+  .speech-text{font-size:26px;font-weight:900;text-align:center;line-height:1.45;padding:10px;}
+  .speech-text.cn{font-family:'Noto Sans SC';}
+  .lang-toggle{display:flex;gap:6px;justify-content:center;margin-bottom:10px;}
+  .lang-toggle button{border:none;cursor:pointer;border-radius:12px;padding:8px 14px;font-weight:900;font-size:13px;background:#eef0ff;color:var(--ink);box-shadow:0 3px 0 var(--shadow);}
+  .lang-toggle button.on{background:var(--accent);color:#fff;}
+  .mic-btn{border:none;cursor:pointer;background:#ff6b6b;width:84px;height:84px;border-radius:50%;font-size:38px;color:#fff;box-shadow:0 6px 0 var(--shadow);margin:6px auto;display:grid;place-items:center;}
+  .mic-btn.rec{animation:pulse 1s infinite;} @keyframes pulse{50%{transform:scale(1.08);box-shadow:0 0 0 12px rgba(255,107,107,.2);}}
+  .heard{background:#f6f8ff;border-radius:14px;padding:10px;font-weight:700;font-size:14px;color:var(--mute);text-align:center;min-height:20px;margin-top:8px;}
+  .score-bar{height:16px;background:#eef0ff;border-radius:8px;overflow:hidden;margin-top:8px;}
+  .score-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#ffc233,#27c281);width:0;transition:width .5s;}
+  /* SCIENCE DEMOS */
+  .demo-stage{position:relative;height:240px;border-radius:20px;overflow:hidden;background:#eaf6ff;box-shadow:inset 0 0 0 3px #d6ecff;}
+  .demo-note{font-weight:800;font-size:14px;color:var(--ink);background:#f0fdf9;border-radius:14px;padding:12px;margin-top:12px;line-height:1.4;}
+  .demo-note .kw{color:#0e9e87;font-weight:900;}
+  .wc-sun{position:absolute;top:12px;right:16px;font-size:40px;animation:spin 16s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .wc-sea{position:absolute;left:0;right:0;bottom:0;height:64px;background:linear-gradient(180deg,#5bb3e8,#2f8fd0);}
+  .wc-cloud{position:absolute;top:40px;left:30px;font-size:48px;}
+  .wc-vapor{position:absolute;bottom:60px;font-size:18px;opacity:0;animation:vapor 3s ease-in infinite;}
+  @keyframes vapor{0%{bottom:60px;opacity:0;}20%{opacity:.9;}100%{bottom:170px;opacity:0;}}
+  .wc-rain{position:absolute;top:84px;font-size:16px;opacity:0;animation:rain 2.4s linear infinite;}
+  @keyframes rain{0%{top:84px;opacity:0;}15%{opacity:1;}100%{top:175px;opacity:0;}}
+  .pbox{position:absolute;inset:24px;border-radius:14px;border:3px solid #b9c6ff;overflow:hidden;background:#fff;}
+  .pdot{position:absolute;width:18px;height:18px;border-radius:50%;background:#ff8a3d;animation:jig 1.6s ease-in-out infinite;transition:all .6s;}
+  .pbox.hot .pdot{animation-duration:.4s;background:#ff5d6c;}
+  @keyframes jig{0%,100%{transform:translate(0,0);}25%{transform:translate(5px,-4px);}50%{transform:translate(-4px,5px);}75%{transform:translate(4px,4px);}}
+  .mag{position:absolute;top:90px;width:70px;height:40px;border-radius:8px;display:flex;font-weight:900;color:#fff;font-size:13px;transition:left .8s ease,right .8s ease;}
+  .mag .n{flex:1;background:#ff5d6c;display:grid;place-items:center;border-radius:8px 0 0 8px;}
+  .mag .s{flex:1;background:#4aa3ff;display:grid;place-items:center;border-radius:0 8px 8px 0;}
+  .mag.left{left:30px;} .mag.right{right:30px;}
+  .sh-lamp{position:absolute;top:18px;font-size:34px;}
+  .sh-obj{position:absolute;top:120px;left:50%;transform:translateX(-50%);width:46px;height:80px;background:#7c5cff;border-radius:10px;}
+  .sh-shadow{position:absolute;top:196px;height:14px;background:rgba(38,48,79,.35);border-radius:50%;filter:blur(2px);transition:all .3s;}
+  .pl-soil{position:absolute;left:0;right:0;bottom:0;height:52px;background:linear-gradient(180deg,#a9744f,#7c4a2d);}
+  .pl-sun{position:absolute;top:12px;right:18px;font-size:38px;}
+  .pl-plant{position:absolute;left:50%;bottom:48px;transform:translateX(-50%) scale(.4);transform-origin:bottom center;font-size:70px;transition:transform 1.2s ease;}
+  .pl-plant.grown{transform:translateX(-50%) scale(1);}
+  .pl-o2{position:absolute;font-size:15px;bottom:96px;opacity:0;}
+  .pl-o2.go{animation:vapor 2.6s ease-in infinite;}
+  .lc-ring{position:absolute;inset:0;display:grid;place-items:center;}
+  .lc-stage{font-size:80px;transition:transform .3s;}
+  .lc-name{position:absolute;top:18px;left:0;right:0;text-align:center;font-weight:900;color:#0e9e87;}
+  .lc-steps{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:14px;}
+  .lc-steps .s{font-size:26px;opacity:.3;transition:all .3s;} .lc-steps .s.on{opacity:1;transform:scale(1.3);}
+  .ct-wrap{position:absolute;inset:0;display:grid;place-items:center;text-align:center;}
+  .ct-bulb{font-size:64px;filter:grayscale(1) opacity(.5);transition:filter .3s,text-shadow .3s;}
+  .ct-bulb.on{filter:none;text-shadow:0 0 26px #ffd23f;}
+  .ct-circuit{font-size:30px;margin-top:6px;letter-spacing:4px;}
+  .st-box{position:absolute;inset:26px;border:3px solid #b9c6ff;border-radius:14px;background:#fff;overflow:hidden;}
+  .st-dot{position:absolute;width:18px;height:18px;border-radius:50%;background:#4aa3ff;transition:all .7s ease;}
+  .st-label{position:absolute;top:6px;left:0;right:0;text-align:center;font-weight:900;color:#2f6bff;}
+  /* progress */
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .stat{background:var(--card);border-radius:18px;padding:14px;box-shadow:0 5px 0 var(--shadow);text-align:center;}
+  .stat .v{font-size:24px;font-weight:900;} .stat .l{font-size:11px;font-weight:800;color:var(--mute);}
+  .chart-card{background:var(--card);border-radius:20px;padding:16px;box-shadow:0 6px 0 var(--shadow);margin-bottom:14px;}
+  .chart-card h3{font-size:14px;font-weight:900;margin-bottom:10px;}
+  .bars{display:flex;align-items:flex-end;gap:6px;height:110px;}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;}
+  .gbar{width:100%;border-radius:8px 8px 0 0;background:linear-gradient(180deg,#7c5cff,#5e3ff0);min-height:4px;transition:height .5s;}
+  .bar-col .lab{font-size:9px;font-weight:800;color:var(--mute);} .bar-col .pct{font-size:10px;font-weight:900;}
+  .mastery-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .mastery-row .nm{flex:0 0 96px;font-size:12px;font-weight:800;}
+  .mtrack{flex:1;height:14px;background:#eef0ff;border-radius:8px;overflow:hidden;}
+  .mfill{height:100%;border-radius:8px;background:linear-gradient(90deg,#ffc233,#27c281);transition:width .6s;}
+  .mastery-row .mp{flex:0 0 40px;text-align:right;font-size:11px;font-weight:900;color:var(--mute);}
+  .empty{text-align:center;color:var(--mute);font-weight:800;font-size:13px;padding:14px;}
+  .reset{display:block;margin:6px auto 0;border:none;cursor:pointer;background:transparent;color:var(--bad);font-weight:800;font-size:12px;text-decoration:underline;}
+  .syncline{text-align:center;font-size:11px;font-weight:800;color:var(--mute);margin-top:6px;}
+  .loading{text-align:center;color:var(--mute);font-weight:800;padding:20px;}
+  .confetti{position:fixed;top:-20px;width:11px;height:11px;z-index:60;pointer-events:none;border-radius:2px;}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;font-weight:800;font-size:13px;padding:10px 18px;border-radius:14px;z-index:70;transition:transform .3s;box-shadow:0 6px 16px rgba(0,0,0,.25);}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .footer-note{text-align:center;color:var(--mute);font-size:11px;font-weight:700;margin-top:14px;}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="app">
+  <header>
+    <div class="brand"><div class="logo">🎒</div><div class="title"><h1>Learning Buddy</h1><p>5 subjects · 1 progress book</p></div></div>
+    <div class="hud">
+      <div class="pill" id="namePill" onclick="changeName()">👤 <span id="studentName">guest</span></div>
+      <div class="pill">⭐ <span id="xp">0</span></div>
+      <div class="pill">🔥 <span id="streak">0</span></div>
+    </div>
+  </header>
+
+  <div id="home" class="screen show">
+    <div class="greet">Choose a subject! 🌟</div>
+    <div class="menu">
+      <button class="tile t-cn" onclick="openSubject('Chinese')"><span class="emoji">🐼</span><span class="nm">Chinese</span><span class="zh">中文</span></button>
+      <button class="tile t-en" onclick="openSubject('English')"><span class="emoji">📚</span><span class="nm">English</span><span class="zh">Words & Grammar</span></button>
+      <button class="tile t-ma" onclick="openSubject('Maths')"><span class="emoji">🧮</span><span class="nm">Maths</span><span class="zh">Numbers</span></button>
+      <button class="tile t-sc" onclick="openSubject('Science')"><span class="emoji">🔬</span><span class="nm">Science</span><span class="zh">Demos & MCQ</span></button>
+      <button class="tile t-sp" onclick="openSubject('Speech')"><span class="emoji">🎤</span><span class="nm">Speech Buddy</span><span class="zh">Read aloud · oral practice</span></button>
+      <button class="tile t-pr" onclick="openProgress()"><span class="emoji">📈</span><span class="nm">My Progress Book</span></button>
+    </div>
+    <p class="footer-note">Every answer is saved. Tap 👤 to switch student · Teacher view lives in the Progress Book.</p>
+  </div>
+
+  <div id="subject" class="screen"><button class="back" onclick="goHome()">⬅ Home</button><div class="sub-head" id="subHead"></div><div class="act-list" id="actList"></div></div>
+
+  <div id="cnCards" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="topic-bar" id="cnTopics"></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+      <div class="flash" id="cnFlash" onclick="cnFlip()"><div class="pic" id="cnPic">🍎</div><div class="front" id="cnHanzi">苹果</div><div class="py" id="cnPy">píngguǒ</div><div class="back" id="cnEng">apple</div></div>
+      <div class="row"><button class="speak-btn" onclick="event.stopPropagation();cnSpeak()">🔊</button><button class="speak-btn slow" onclick="event.stopPropagation();cnSpeakSlow()">🐢<span class="x3">×3</span></button></div>
+      <div class="row"><button class="nav-btn" onclick="cnNav(-1)">‹</button><div class="counter" id="cnCount">1 / 8</div><button class="nav-btn" onclick="cnNav(1)">›</button></div>
+    </div>
+  </div>
+
+  <div id="cnBuild" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="lead">🧩 <b>造句</b> — drag (or tap) the words into order.</div>
+    <div class="qcard">
+      <div style="text-align:center"><div style="font-size:52px" id="cbPic">🐱</div><div style="font-weight:800;color:var(--accent2)" id="cbHint"></div></div>
+      <div class="dropzone" id="cbSlots" style="margin-top:12px"></div>
+      <div class="bank" id="cbBank"></div>
+      <div class="feedback" id="cbFb"></div>
+      <div class="row" style="margin-top:6px"><button class="action-btn b-clear" onclick="cbLoad(cbIdx)">↺ Clear</button><button class="action-btn b-ok" onclick="cbCheck()">✓ Check</button><button class="action-btn b-next" onclick="cbNext()">Next ➜</button></div>
+    </div>
+  </div>
+
+  <div id="cnListen" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="lead">👂 <b>听一听</b> — listen, then tap the matching picture.</div>
+    <div class="qcard"><div class="row"><button class="speak-btn" style="width:84px;height:84px;font-size:38px" onclick="clSpeak()">▶</button></div><div class="opts" id="clOpts"></div><div class="feedback" id="clFb"></div></div>
+  </div>
+
+  <div id="cnTone" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="lead">🎵 <b>声调</b> — the four Mandarin tones.</div>
+    <div class="dots" id="toneDots"></div>
+    <div class="tone-card"><div class="tone-num" id="toneNum">Tone 1</div><div class="tone-shape" id="toneShape">→</div><div class="tone-name" id="toneName">First tone</div><div class="tone-desc" id="toneDesc"></div><div class="tone-ex"><div class="pic" id="tonePic">👩</div><div><div class="hz" id="toneHz">妈</div><div class="py" id="tonePyEx">mā</div><div class="en" id="toneEn">mum</div></div></div></div>
+    <div class="row" style="margin-top:12px"><button class="nav-btn" onclick="toneNav(-1)">‹</button><button class="speak-btn" onclick="toneSpeak()">🔊</button><button class="nav-btn" onclick="toneNav(1)">›</button></div>
+  </div>
+
+  <div id="cnStroke" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="topic-bar" id="stkBar"></div>
+    <div style="text-align:center;font-weight:800;color:var(--accent2)" id="stkLabel">人 · rén · person</div>
+    <div class="pad" id="stkPad" style="margin-top:10px"><div class="gl glv"></div><div class="gl glh"></div><div class="guide" id="stkGuide">人</div><canvas id="stkCanvas" width="280" height="280"></canvas></div>
+    <div class="row" style="margin-top:12px"><button class="action-btn b-clear" onclick="stkClear()">↺ Erase</button><button class="action-btn b-ok" onclick="stkDone()">✓ Done!</button></div>
+    <div class="feedback" id="stkFb"></div>
+  </div>
+
+  <div id="flash" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="lead" id="flashLead"></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+      <div class="flash" id="flashCard" onclick="flipFlash()"><div class="pic" id="flPic"></div><div class="front" id="flFront"></div><div class="py" id="flPy"></div><div class="back" id="flBack"></div></div>
+      <button class="speak-btn" onclick="event.stopPropagation();speakFlash()">🔊</button>
+      <div class="row"><button class="nav-btn" onclick="navFlash(-1)">‹</button><div class="counter" id="flCount"></div><button class="nav-btn" onclick="navFlash(1)">›</button></div>
+    </div>
+  </div>
+
+  <div id="quiz" class="screen"><button class="back" onclick="goHome()">⬅ Home</button><div class="lead" id="quizLead"></div><div class="qcard"><div class="qpic" id="qPic"></div><div class="qtext" id="qText"></div><div class="opts" id="qOpts"></div><div class="feedback" id="qFb"></div></div></div>
+
+  <div id="speed" class="screen"><button class="back" onclick="goHome()">⬅ Home</button><div class="lead">⚡ <b>Speed Sums</b> — solve and tap ✓.</div><div class="qcard"><div class="qtext" id="speedScore">Score: 0</div><div class="eq" id="speedEq"></div><div class="keypad" id="speedKeys"></div><div class="feedback" id="speedFb"></div></div></div>
+
+  <div id="bonds" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="lead">🧩 <b>Number Bonds</b> — drag the missing number into the empty circle.</div>
+    <div class="qcard"><div style="text-align:center;font-weight:800;color:var(--accent2)" id="bondType"></div><div class="bond"><div class="whole" id="bW">?</div><div class="legs"><div class="part a" id="bA">2</div><div class="part b" id="bB">3</div></div></div><div class="bank" id="bBank"></div><div class="feedback" id="bFb"></div><div class="row" style="margin-top:6px"><button class="action-btn b-next" onclick="newBond()">Next ➜</button></div></div>
+  </div>
+
+  <div id="mathBuild" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="lead">🌉 <b>Build the Sentence</b> — count the pictures, then drag numbers to complete the sum.</div>
+    <div class="qcard"><div style="text-align:center;font-size:34px" id="mbPics"></div><div class="eqrow"><div class="eqslot" id="mbA"></div><span>+</span><div class="eqslot" id="mbB"></div><span>=</span><div class="eqslot" id="mbC"></div></div><div class="bank" id="mbBank"></div><div class="feedback" id="mbFb"></div><div class="row" style="margin-top:6px"><button class="action-btn b-clear" onclick="mbLoad()">↺ Clear</button><button class="action-btn b-ok" onclick="mbCheck()">✓ Check</button><button class="action-btn b-next" onclick="mbLoad()">Next ➜</button></div></div>
+  </div>
+
+  <div id="sciDemo" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="topic-bar" id="demoBar"></div>
+    <div class="qcard"><div class="demo-stage" id="demoStage"></div><div class="demo-note" id="demoNote"></div></div>
+    <div class="row" style="margin-top:10px"><button class="action-btn b-go" id="demoAction" style="display:none"></button></div>
+  </div>
+
+  <div id="speech" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="lead">🎤 <b>Speech Buddy</b> — tap 🔊 to listen, then 🎤 to read it aloud.</div>
+    <div class="lang-toggle"><button id="spEn" class="on" onclick="setSpeechLang('en')">🇬🇧 English</button><button id="spCn" onclick="setSpeechLang('zh')">🐼 中文</button></div>
+    <div class="qcard"><div class="speech-text" id="spText"></div><div class="row" style="margin-top:6px"><button class="speak-btn" onclick="speakSpeech()">🔊</button></div><div class="mic-btn" id="micBtn" onclick="recordSpeech()">🎤</div><div class="heard" id="spHeard">Tap 🎤 and read the sentence</div><div class="score-bar"><div class="score-fill" id="spScoreFill"></div></div><div class="feedback" id="spFb"></div><div class="row" style="margin-top:6px"><button class="action-btn b-next" onclick="nextSpeech()">Next sentence ➜</button></div></div>
+  </div>
+
+  <div id="enCards" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="topic-bar" id="enTopics"></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+      <div class="flash" id="enFlash" onclick="enSpeak()"><div class="pic" id="enPic">🐱</div><div class="front en" id="enWord">cat</div></div>
+      <button class="speak-btn" onclick="event.stopPropagation();enSpeak()">🔊</button>
+      <div class="row"><button class="nav-btn" onclick="enNav(-1)">‹</button><div class="counter" id="enCount">1 / 8</div><button class="nav-btn" onclick="enNav(1)">›</button></div>
+    </div>
+  </div>
+
+  <div id="enBuild" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="lead">🧩 <b>Build a Sentence</b> — drag (or tap) the words into the right order.</div>
+    <div class="qcard">
+      <div style="text-align:center"><div style="font-size:52px" id="enbPic">🐱</div><div style="font-weight:800;color:var(--accent2)" id="enbHint"></div></div>
+      <div class="dropzone" id="enbSlots" style="margin-top:12px"></div>
+      <div class="bank" id="enbBank"></div>
+      <div class="feedback" id="enbFb"></div>
+      <div class="row" style="margin-top:6px"><button class="action-btn b-clear" onclick="enbLoad(enbIdx)">↺ Clear</button><button class="action-btn b-ok" onclick="enbCheck()">✓ Check</button><button class="action-btn b-next" onclick="enbNext()">Next ➜</button></div>
+    </div>
+  </div>
+
+  <div id="soundPlay" class="screen">
+    <button class="back" onclick="goHome()">⬅ Home</button>
+    <div class="lead">🗣️ <b>Sound Practice</b> — pick a sound, listen, then say the word. Great for R, S and L!</div>
+    <div class="topic-bar" id="sndTabs"></div>
+    <div class="qcard" style="text-align:center">
+      <div style="font-size:80px" id="sndPic">🐰</div>
+      <div style="font-size:38px;font-weight:900" id="sndWord">rabbit</div>
+      <div class="counter" id="sndCount" style="margin-top:6px"></div>
+      <div class="row" style="margin-top:10px"><button class="speak-btn" onclick="soundSpeak()">🔊</button></div>
+      <div class="mic-btn" id="sndMic" onclick="soundRecord()">🎤</div>
+      <div class="heard" id="sndHeard">Tap 🔊 to hear it, then 🎤 to say it</div>
+      <div class="feedback" id="sndFb"></div>
+      <div class="row" style="margin-top:8px"><button class="nav-btn" onclick="soundNav(-1)">‹</button><button class="action-btn b-go" onclick="soundTwister()">🌀 Tongue twister</button><button class="nav-btn" onclick="soundNav(1)">›</button></div>
+    </div>
+  </div>
+
+  <div id="progress" class="screen"><button class="back" onclick="goHome()">⬅ Home</button><div id="progBody"><div class="loading">Loading progress… ⏳</div></div></div>
+</div>
+
+<script>
+/* ===== STORAGE (localStorage default; set API_BASE="/api" for Vercel DB) ===== */
+const API_BASE = "/api";
+let STUDENT="guest", SYNC="local";
+async function apiGet(id){
+  if(API_BASE){ try{ const r=await fetch(`${API_BASE}/progress?id=${encodeURIComponent(id)}`); if(r.ok){ SYNC="cloud ✓"; return await r.json(); } }catch(e){} SYNC="cloud ✗ (offline)"; return null; }
+  SYNC="this device"; try{ const raw=localStorage.getItem('buddy:'+id); return raw?JSON.parse(raw):null; }catch(e){ return null; }
+}
+async function apiSet(id,data){
+  if(API_BASE){ try{ await fetch(`${API_BASE}/progress`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,data})}); SYNC="cloud ✓"; }catch(e){ SYNC="cloud ✗ (offline)"; } return; }
+  try{ localStorage.setItem('buddy:'+id, JSON.stringify(data)); }catch(e){}
+}
+const dbLoad=()=>apiGet(STUDENT);
+const dbSave=(d)=>apiSet(STUDENT,d);
+async function rosterGet(){ return (await apiGet('__roster__'))||[]; }
+async function rosterAdd(name){ if(!name||name==='__roster__')return; const r=await rosterGet(); if(!r.includes(name)){ r.push(name); await apiSet('__roster__',r); } }
+
+let DB=null;
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const SUBJECTS=['Chinese','English','Maths','Science','Speech'];
+const EMOJI={Chinese:'🐼',English:'📚',Maths:'🧮',Science:'🔬',Speech:'🎤'};
+const blankDB=()=>({xp:0,streak:0,lastDay:null,sessions:{},subjects:Object.fromEntries(SUBJECTS.map(s=>[s,{c:0,t:0}])),activities:{}});
+async function initDB(){
+  try{ STUDENT=localStorage.getItem('buddy:current')||'guest'; }catch(e){ STUDENT='guest'; }
+  $('studentName').textContent=STUDENT;
+  DB=await dbLoad()||blankDB();
+  const t=todayStr();
+  if(DB.lastDay!==t){ const y=new Date(Date.now()-86400000).toISOString().slice(0,10); DB.streak=DB.lastDay===y?(DB.streak||0)+1:1; DB.lastDay=t; await dbSave(DB); }
+  await rosterAdd(STUDENT); refreshHUD();
+}
+let saveTimer=null;
+function persist(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>dbSave(DB),150); }
+function refreshHUD(){ $('xp').textContent=DB?DB.xp:0; $('streak').textContent=DB?DB.streak:0; }
+function record(subject,correct,xp){
+  const t=todayStr(); DB.sessions[t]=DB.sessions[t]||{correct:0,total:0}; DB.sessions[t].total++; if(correct)DB.sessions[t].correct++;
+  if(subject){ DB.subjects[subject]=DB.subjects[subject]||{c:0,t:0}; DB.subjects[subject].t++; if(correct)DB.subjects[subject].c++; }
+  if(correct){ DB.xp+=(xp||5); addXpFx(); } refreshHUD(); persist();
+}
+function bumpAct(k){ DB.activities[k]=(DB.activities[k]||0)+1; persist(); }
+async function changeName(){
+  const raw=prompt('Who is playing? (a name for the progress book)',STUDENT); if(!raw)return;
+  const n=raw.trim().replace(/[^\w \-\u4e00-\u9fff]/g,'').slice(0,20)||'guest';
+  STUDENT=n; try{ localStorage.setItem('buddy:current',n); }catch(e){}
+  $('studentName').textContent=n; DB=await dbLoad()||blankDB();
+  const t=todayStr(); if(DB.lastDay!==t){ DB.lastDay=t; DB.streak=DB.streak||1; }
+  await rosterAdd(n); refreshHUD(); toast('Now playing as '+n);
+}
+
+/* ===== CONTENT ===== */
+const TOPICS={
+ "First Words 第一句话":[{h:"要",p:"yào",e:"want",pic:"🙋"},{h:"吃",p:"chī",e:"eat",pic:"🍽️"},{h:"喝",p:"hē",e:"drink",pic:"🥤"},{h:"好",p:"hǎo",e:"okay",pic:"👍"},{h:"不要",p:"búyào",e:"no",pic:"🙅"},{h:"抱抱",p:"bàobào",e:"hug",pic:"🤗"}],
+ "Fruit 水果":[{h:"苹果",p:"píngguǒ",e:"apple",pic:"🍎"},{h:"香蕉",p:"xiāngjiāo",e:"banana",pic:"🍌"},{h:"橙子",p:"chéngzi",e:"orange",pic:"🍊"},{h:"西瓜",p:"xīguā",e:"watermelon",pic:"🍉"},{h:"草莓",p:"cǎoméi",e:"strawberry",pic:"🍓"},{h:"葡萄",p:"pútáo",e:"grapes",pic:"🍇"}],
+ "Animals 动物":[{h:"猫",p:"māo",e:"cat",pic:"🐱"},{h:"狗",p:"gǒu",e:"dog",pic:"🐶"},{h:"兔子",p:"tùzi",e:"rabbit",pic:"🐰"},{h:"鱼",p:"yú",e:"fish",pic:"🐟"},{h:"鸟",p:"niǎo",e:"bird",pic:"🐦"},{h:"熊猫",p:"xióngmāo",e:"panda",pic:"🐼"}],
+ "Colours 颜色":[{h:"红色",p:"hóngsè",e:"red",pic:"🔴"},{h:"蓝色",p:"lánsè",e:"blue",pic:"🔵"},{h:"黄色",p:"huángsè",e:"yellow",pic:"🟡"},{h:"绿色",p:"lǜsè",e:"green",pic:"🟢"},{h:"紫色",p:"zǐsè",e:"purple",pic:"🟣"},{h:"黑色",p:"hēisè",e:"black",pic:"⚫"}],
+ "Numbers 数字":[{h:"一",p:"yī",e:"one",pic:"1️⃣"},{h:"二",p:"èr",e:"two",pic:"2️⃣"},{h:"三",p:"sān",e:"three",pic:"3️⃣"},{h:"四",p:"sì",e:"four",pic:"4️⃣"},{h:"五",p:"wǔ",e:"five",pic:"5️⃣"},{h:"六",p:"liù",e:"six",pic:"6️⃣"}],
+ "Family 家人":[{h:"爸爸",p:"bàba",e:"daddy",pic:"👨"},{h:"妈妈",p:"māma",e:"mummy",pic:"👩"},{h:"哥哥",p:"gēge",e:"big brother",pic:"👦"},{h:"姐姐",p:"jiějie",e:"big sister",pic:"👧"},{h:"爷爷",p:"yéye",e:"grandpa",pic:"👴"},{h:"奶奶",p:"nǎinai",e:"grandma",pic:"👵"}],
+ "Food 食物":[{h:"饭",p:"fàn",e:"rice",pic:"🍚"},{h:"面",p:"miàn",e:"noodles",pic:"🍜"},{h:"水",p:"shuǐ",e:"water",pic:"💧"},{h:"蛋",p:"dàn",e:"egg",pic:"🥚"},{h:"面包",p:"miànbāo",e:"bread",pic:"🍞"},{h:"奶",p:"nǎi",e:"milk",pic:"🥛"}],
+ "Weather 天气":[{h:"太阳",p:"tàiyáng",e:"sun",pic:"☀️"},{h:"雨",p:"yǔ",e:"rain",pic:"🌧️"},{h:"云",p:"yún",e:"cloud",pic:"☁️"},{h:"风",p:"fēng",e:"wind",pic:"💨"},{h:"雪",p:"xuě",e:"snow",pic:"❄️"},{h:"彩虹",p:"cǎihóng",e:"rainbow",pic:"🌈"}],
+};
+const TONES=[
+ {n:"1",name:"First tone",arrow:"→",desc:"High and flat, like singing one note",color:"#ff6b9d",ex:{h:"妈",p:"mā",e:"mum",pic:"👩"}},
+ {n:"2",name:"Second tone",arrow:"↗",desc:'Rising up, like asking "huh?"',color:"#ffb340",ex:{h:"麻",p:"má",e:"hemp",pic:"🌿"}},
+ {n:"3",name:"Third tone",arrow:"↘↗",desc:"Dips down then up, like a valley",color:"#56c596",ex:{h:"马",p:"mǎ",e:"horse",pic:"🐴"}},
+ {n:"4",name:"Fourth tone",arrow:"↘",desc:'Falling sharply, like saying "No!"',color:"#5bb3d4",ex:{h:"骂",p:"mà",e:"scold",pic:"😠"}},
+];
+const STROKES=[{h:"一",p:"yī",e:"one",s:1},{h:"二",p:"èr",e:"two",s:2},{h:"三",p:"sān",e:"three",s:3},{h:"十",p:"shí",e:"ten",s:2},{h:"人",p:"rén",e:"person",s:2},{h:"大",p:"dà",e:"big",s:3},{h:"小",p:"xiǎo",e:"small",s:3},{h:"口",p:"kǒu",e:"mouth",s:3},{h:"日",p:"rì",e:"sun",s:4},{h:"月",p:"yuè",e:"moon",s:4},{h:"山",p:"shān",e:"mountain",s:3},{h:"水",p:"shuǐ",e:"water",s:4}];
+const SENTENCES=[
+ {pic:"🐱🐟",hint:'"The cat eats fish."',words:[{h:"猫",p:"māo"},{h:"吃",p:"chī"},{h:"鱼",p:"yú"}],ans:["猫","吃","鱼"]},
+ {pic:"🍎❤️",hint:'"I like apples."',words:[{h:"我",p:"wǒ"},{h:"喜欢",p:"xǐhuan"},{h:"苹果",p:"píngguǒ"}],ans:["我","喜欢","苹果"]},
+ {pic:"👩💧",hint:'"Mummy drinks water."',words:[{h:"妈妈",p:"māma"},{h:"喝",p:"hē"},{h:"水",p:"shuǐ"}],ans:["妈妈","喝","水"]},
+ {pic:"👦🍚",hint:'"Big brother eats rice."',words:[{h:"哥哥",p:"gēge"},{h:"吃",p:"chī"},{h:"饭",p:"fàn"}],ans:["哥哥","吃","饭"]},
+ {pic:"🐰🥕",hint:'"I have a rabbit."',words:[{h:"我",p:"wǒ"},{h:"有",p:"yǒu"},{h:"兔子",p:"tùzi"}],ans:["我","有","兔子"]},
+];
+const DECK_EN=[{pic:'🐈',front:'cat',back:'a small furry pet that says meow'},{pic:'🏫',front:'school',back:'where we go to learn'},{pic:'🍚',front:'rice',back:'food we often eat at the hawker centre'},{pic:'⬆️',front:'on',back:'the cup is ON the table'},{pic:'⬇️',front:'under',back:'the cat is UNDER the chair'},{pic:'📦',front:'in',back:'the toy is IN the box'},{pic:'↔️',front:'beside',back:'I sit BESIDE my friend'},{pic:'🚪',front:'behind',back:'the bag is BEHIND the door'},{pic:'😊',front:'happy',back:'feeling good and smiling'},{pic:'🌧️',front:'wet',back:'covered with water, like in the rain'}];
+const DECK_SC=[{pic:'💨',front:'Evaporation',back:'Water turns to vapour when it gains heat'},{pic:'🥄',front:'Conductor',back:'Lets heat pass through easily'},{pic:'🧱',front:'Opaque',back:'Blocks light; forms a shadow'},{pic:'🧲',front:'Magnetic',back:'Attracted to a magnet, e.g. iron'},{pic:'🌱',front:'Germination',back:'A seed begins to grow'},{pic:'🫁',front:'Respiratory',back:'The system that helps us breathe'},{pic:'⚡',front:'Circuit',back:'A complete loop that lets electricity flow'},{pic:'🌿',front:'Photosynthesis',back:'Plants make food using sunlight, water & CO₂'},{pic:'🦋',front:'Life cycle',back:'The stages from egg to adult'},{pic:'🧊',front:'States of matter',back:'Solid, liquid and gas'},{pic:'🔆',front:'Translucent',back:'Lets some light through; not clear'},{pic:'🌬️',front:'Friction',back:'A force that slows things rubbing together'}];
+const MCQ_EN=[{pic:'🍎🧺',q:'The apple is ___ the basket.',opts:['in','on','under','behind'],a:0},{pic:'🐱🪑',q:'The cat is ___ the chair.',opts:['on','under','in','beside'],a:1},{pic:'📚🪑',q:'The books are ___ the table.',opts:['on','in','under','behind'],a:0},{pic:'🧒🚪',q:'The boy is ___ the door.',opts:['behind','in','on','under'],a:0},{pic:'✏️📕',q:'The pencil is ___ the book.',opts:['beside','inside','under','below'],a:0},{pic:'👧',q:'She ___ my best friend.',opts:['is','are','am','be'],a:0},{pic:'🐶🐶',q:'I have two ___.',opts:['dog','dogs','doges','dog s'],a:1},{pic:'🍎',q:'I want ___ apple, please.',opts:['a','an','the','two'],a:1},{pic:'☂️',q:'Bring an umbrella when it ___.',opts:['rains','rain','raining','rained'],a:0},{pic:'🐦🌳',q:'The bird is ___ the tree.',opts:['in','below','beside','behind'],a:0},{pic:'🐈',q:'___ is a cat.',opts:['This','These','Those','Am'],a:0},{pic:'🍪🍪🍪',q:'There are many ___.',opts:['cookie','cookies','cookys','cookie s'],a:1},{pic:'👦',q:'He ___ a red ball.',opts:['have','has','having','haves'],a:1},{pic:'🌙',q:'The opposite of "day" is ___.',opts:['night','sun','noon','light'],a:0},{pic:'⬆️⬇️',q:'The opposite of "up" is ___.',opts:['down','top','high','over'],a:0},{pic:'👩',q:'___ name is Mary.',opts:['Her','She','He','Him'],a:0},{pic:'🐟🐟',q:'I see two ___ in the pond.',opts:['fish','fishs','fishes','fishies'],a:0},{pic:'🍦',q:'This ice cream ___ cold.',opts:['is','are','am','be'],a:0}];
+const MCQ_SC=[{pic:'🥄',q:'Best conductor of heat?',opts:['Plastic','Wood','Metal','Cotton'],a:2},{pic:'🌑',q:'A shadow forms when light is blocked by something…',opts:['transparent','opaque','shiny','wet'],a:1},{pic:'🫧',q:'Puddles dry on a sunny day because of…',opts:['freezing','evaporation','melting','condensation'],a:1},{pic:'🧲',q:'A magnet attracts a…',opts:['plastic cup','iron nail','glass marble','rubber band'],a:1},{pic:'🐝',q:'Pollen moving from stamen to stigma is…',opts:['germination','pollination','respiration','digestion'],a:1},{pic:'💡',q:'A bulb lights up only when the circuit is…',opts:['open','broken','closed','wet'],a:2},{pic:'🌿',q:'In photosynthesis, plants give out…',opts:['oxygen','carbon dioxide','smoke','soil'],a:0},{pic:'🦋',q:'Correct butterfly life cycle order?',opts:['egg→pupa→larva→adult','egg→larva→pupa→adult','larva→egg→adult→pupa','adult→egg→pupa→larva'],a:1},{pic:'🧊',q:'Ice melting into water changes from…',opts:['liquid to gas','solid to liquid','gas to solid','liquid to solid'],a:1},{pic:'🌱',q:'A seed needs these to germinate:',opts:['water, air, warmth','sunlight only','soil only','salt'],a:0}];
+const SPEECH_EN=['The little red hen baked a warm loaf of bread.','Please remember to bring your umbrella when it rains.','The happy children played games in the sunny park.','My favourite hobby is reading adventure storybooks.','A frog and a fox sat under a big green tree.','The bus stopped at the corner near my school.','We saw three striped tigers at the zoo today.','Grandma cooked a delicious pot of chicken soup.','The bright yellow kite flew high up in the sky.','I brush my teeth and wash my face every morning.'];
+const SPEECH_CN=['今天天气很好。','我喜欢吃水果。','小猫在睡觉。','我们一起去公园玩。','哥哥在学校读书。','妈妈买了红色的苹果。','小鸟在树上唱歌。','弟弟喜欢踢足球。','我每天早上喝牛奶。','下雨了，记得带雨伞。'];
+const SOUNDS={
+ s:{words:[{w:'snake',pic:'🐍'},{w:'sun',pic:'☀️'},{w:'sock',pic:'🧦'}],twister:'Sammy snake says sssss.'},
+ a:{words:[{w:'apple',pic:'🍎'},{w:'ant',pic:'🐜'},{w:'axe',pic:'🪓'}],twister:'Annie ant adds apples.'},
+ t:{words:[{w:'tiger',pic:'🐯'},{w:'tap',pic:'🚰'},{w:'top',pic:'🔝'}],twister:'Ten tall tigers.'},
+ i:{words:[{w:'insect',pic:'🐛'},{w:'igloo',pic:'🛖'},{w:'ink',pic:'🖋️'}],twister:'Izzy insect is in.'},
+ p:{words:[{w:'pig',pic:'🐷'},{w:'pen',pic:'🖊️'},{w:'pot',pic:'🍲'}],twister:'Polly pig paints pots.'},
+ n:{words:[{w:'net',pic:'🥅'},{w:'nose',pic:'👃'},{w:'nut',pic:'🥜'}],twister:'Nine nice nuts.'},
+ c:{words:[{w:'cat',pic:'🐱'},{w:'cup',pic:'☕'},{w:'car',pic:'🚗'}],twister:'Curly cat can curl.'},
+ k:{words:[{w:'kite',pic:'🪁'},{w:'key',pic:'🔑'},{w:'king',pic:'🤴'}],twister:'Kind kings keep keys.'},
+ e:{words:[{w:'egg',pic:'🥚'},{w:'elephant',pic:'🐘'},{w:'elbow',pic:'💪'}],twister:'Eddy elephant.'},
+ h:{words:[{w:'hat',pic:'🎩'},{w:'house',pic:'🏠'},{w:'hand',pic:'✋'}],twister:'Happy hens hop.'},
+ r:{words:[{w:'rabbit',pic:'🐰'},{w:'ring',pic:'💍'},{w:'rocket',pic:'🚀'}],twister:'Round the rugged rock.'},
+ m:{words:[{w:'moon',pic:'🌙'},{w:'mouse',pic:'🐭'},{w:'milk',pic:'🥛'}],twister:'Many mice munch.'},
+ d:{words:[{w:'dog',pic:'🐶'},{w:'duck',pic:'🦆'},{w:'door',pic:'🚪'}],twister:'Daddy duck dives.'},
+ g:{words:[{w:'goat',pic:'🐐'},{w:'gift',pic:'🎁'},{w:'girl',pic:'👧'}],twister:'Greedy goats.'},
+ o:{words:[{w:'octopus',pic:'🐙'},{w:'orange',pic:'🍊'},{w:'ox',pic:'🐂'}],twister:'Olly octopus.'},
+ u:{words:[{w:'umbrella',pic:'☂️'},{w:'up',pic:'⬆️'},{w:'cup',pic:'☕'}],twister:'Up the umbrella.'},
+ l:{words:[{w:'lion',pic:'🦁'},{w:'leaf',pic:'🍃'},{w:'lamp',pic:'💡'}],twister:'Lazy lions lick.'},
+ f:{words:[{w:'fish',pic:'🐟'},{w:'fan',pic:'🪭'},{w:'fire',pic:'🔥'}],twister:'Five funny fish.'},
+ b:{words:[{w:'ball',pic:'⚽'},{w:'bus',pic:'🚌'},{w:'bear',pic:'🐻'}],twister:'Big brown bears.'},
+ ai:{words:[{w:'rain',pic:'🌧️'},{w:'train',pic:'🚆'},{w:'snail',pic:'🐌'}],twister:'Snails in the rain.'},
+ j:{words:[{w:'jet',pic:'✈️'},{w:'jam',pic:'🍯'},{w:'jug',pic:'🫗'}],twister:'Jolly jumping jellyfish.'},
+ oa:{words:[{w:'boat',pic:'⛵'},{w:'goat',pic:'🐐'},{w:'coat',pic:'🧥'}],twister:'A goat in a coat.'},
+ ie:{words:[{w:'pie',pic:'🥧'},{w:'tie',pic:'👔'},{w:'lie',pic:'🤥'}],twister:'A pie and a tie.'},
+ ee:{words:[{w:'bee',pic:'🐝'},{w:'tree',pic:'🌳'},{w:'feet',pic:'🦶'}],twister:'Three green trees.'},
+ or:{words:[{w:'fork',pic:'🍴'},{w:'corn',pic:'🌽'},{w:'horse',pic:'🐴'}],twister:'Forty horses.'},
+ z:{words:[{w:'zebra',pic:'🦓'},{w:'zip',pic:'🤐'},{w:'zoo',pic:'🦁'}],twister:'Zippy zebras zoom.'},
+ w:{words:[{w:'web',pic:'🕸️'},{w:'window',pic:'🪟'},{w:'watch',pic:'⌚'}],twister:'Wendy watches.'},
+ ng:{words:[{w:'ring',pic:'💍'},{w:'king',pic:'🤴'},{w:'song',pic:'🎵'}],twister:'A king sings a song.'},
+ v:{words:[{w:'van',pic:'🚐'},{w:'violin',pic:'🎻'},{w:'vest',pic:'🦺'}],twister:'Velvet vans.'},
+ oo:{words:[{w:'moon',pic:'🌙'},{w:'boot',pic:'🥾'},{w:'book',pic:'📖'}],twister:'The moon at noon.'},
+ y:{words:[{w:'yak',pic:'🐃'},{w:'yoyo',pic:'🪀'},{w:'yellow',pic:'🟡'}],twister:'Yellow yaks.'},
+ x:{words:[{w:'box',pic:'📦'},{w:'fox',pic:'🦊'},{w:'six',pic:'6️⃣'}],twister:'Six foxes in a box.'},
+ ch:{words:[{w:'chair',pic:'🪑'},{w:'cheese',pic:'🧀'},{w:'chick',pic:'🐤'}],twister:'Cheeky chicks.'},
+ sh:{words:[{w:'ship',pic:'🚢'},{w:'shell',pic:'🐚'},{w:'shoe',pic:'👟'}],twister:'She sells shells.'},
+ th:{words:[{w:'thumb',pic:'👍'},{w:'three',pic:'3️⃣'},{w:'thorn',pic:'🌹'}],twister:'Thirty thick thistles.'},
+ qu:{words:[{w:'queen',pic:'👑'},{w:'quilt',pic:'🛏️'},{w:'quack',pic:'🦆'}],twister:'Quick queens.'},
+ ou:{words:[{w:'cloud',pic:'☁️'},{w:'house',pic:'🏠'},{w:'mouse',pic:'🐭'}],twister:'A mouse in a house.'},
+ oi:{words:[{w:'coin',pic:'🪙'},{w:'oil',pic:'🛢️'},{w:'soil',pic:'🌱'}],twister:'Boil the oil.'},
+ ue:{words:[{w:'blue',pic:'🔵'},{w:'glue',pic:'🧴'},{w:'true',pic:'✅'}],twister:'Blue glue is true.'},
+ er:{words:[{w:'hammer',pic:'🔨'},{w:'ladder',pic:'🪜'},{w:'sister',pic:'👧'}],twister:'A hammer and a ladder.'},
+ ar:{words:[{w:'car',pic:'🚗'},{w:'star',pic:'⭐'},{w:'shark',pic:'🦈'}],twister:'Sharks in the park.'},
+ igh:{words:[{w:'light',pic:'💡'},{w:'night',pic:'🌙'},{w:'high',pic:'🔼'}],twister:'A bright light at night.'},
+ ow:{words:[{w:'cow',pic:'🐮'},{w:'owl',pic:'🦉'},{w:'clown',pic:'🤡'}],twister:'A brown owl.'},
+ air:{words:[{w:'chair',pic:'🪑'},{w:'hair',pic:'💇'},{w:'fair',pic:'🎡'}],twister:'Fair hair.'},
+ ear:{words:[{w:'ear',pic:'👂'},{w:'year',pic:'📅'},{w:'beard',pic:'🧔'}],twister:'Hear with your ear.'}
+};
+const EN_TOPICS={
+"Animals":[{w:'cat',pic:'🐱'},{w:'dog',pic:'🐶'},{w:'cow',pic:'🐮'},{w:'pig',pic:'🐷'},{w:'hen',pic:'🐔'},{w:'duck',pic:'🦆'},{w:'fish',pic:'🐟'},{w:'frog',pic:'🐸'},{w:'bird',pic:'🐦'},{w:'lion',pic:'🦁'},{w:'bear',pic:'🐻'},{w:'fox',pic:'🦊'},{w:'owl',pic:'🦉'},{w:'bee',pic:'🐝'},{w:'ant',pic:'🐜'},{w:'goat',pic:'🐐'}],
+"Sea Life":[{w:'shark',pic:'🦈'},{w:'whale',pic:'🐋'},{w:'crab',pic:'🦀'},{w:'octopus',pic:'🐙'},{w:'turtle',pic:'🐢'},{w:'starfish',pic:'⭐'},{w:'jellyfish',pic:'🪼'},{w:'seahorse',pic:'🐠'}],
+"Bugs":[{w:'butterfly',pic:'🦋'},{w:'spider',pic:'🕷️'},{w:'snail',pic:'🐌'},{w:'caterpillar',pic:'🐛'},{w:'ladybird',pic:'🐞'},{w:'worm',pic:'🪱'}],
+"Food":[{w:'rice',pic:'🍚'},{w:'bread',pic:'🍞'},{w:'egg',pic:'🥚'},{w:'milk',pic:'🥛'},{w:'cake',pic:'🍰'},{w:'soup',pic:'🍲'},{w:'noodles',pic:'🍜'},{w:'water',pic:'💧'},{w:'juice',pic:'🧃'},{w:'chicken',pic:'🍗'},{w:'cheese',pic:'🧀'},{w:'corn',pic:'🌽'},{w:'carrot',pic:'🥕'},{w:'honey',pic:'🍯'},{w:'ice cream',pic:'🍦'},{w:'apple',pic:'🍎'}],
+"Fruit":[{w:'orange',pic:'🍊'},{w:'banana',pic:'🍌'},{w:'watermelon',pic:'🍉'},{w:'strawberry',pic:'🍓'},{w:'pear',pic:'🍐'},{w:'mango',pic:'🥭'},{w:'pineapple',pic:'🍍'},{w:'grapes',pic:'🍇'}],
+"My Body":[{w:'head',pic:'🧑'},{w:'eyes',pic:'👀'},{w:'ears',pic:'👂'},{w:'nose',pic:'👃'},{w:'mouth',pic:'👄'},{w:'hand',pic:'✋'},{w:'foot',pic:'🦶'},{w:'arm',pic:'💪'},{w:'leg',pic:'🦵'},{w:'hair',pic:'💇'},{w:'teeth',pic:'🦷'},{w:'finger',pic:'👆'}],
+"Home":[{w:'bed',pic:'🛏️'},{w:'door',pic:'🚪'},{w:'chair',pic:'🪑'},{w:'lamp',pic:'💡'},{w:'cup',pic:'☕'},{w:'spoon',pic:'🥄'},{w:'fork',pic:'🍴'},{w:'plate',pic:'🍽️'},{w:'clock',pic:'🕐'},{w:'window',pic:'🪟'},{w:'sofa',pic:'🛋️'},{w:'key',pic:'🔑'}],
+"School":[{w:'pen',pic:'🖊️'},{w:'pencil',pic:'✏️'},{w:'book',pic:'📖'},{w:'bag',pic:'🎒'},{w:'ruler',pic:'📏'},{w:'crayon',pic:'🖍️'},{w:'glue',pic:'🧴'},{w:'scissors',pic:'✂️'},{w:'paper',pic:'📄'},{w:'paint',pic:'🎨'},{w:'teacher',pic:'👩‍🏫'},{w:'friend',pic:'🧒'}],
+"Actions":[{w:'run',pic:'🏃'},{w:'jump',pic:'🤸'},{w:'eat',pic:'🍽️'},{w:'drink',pic:'🥤'},{w:'sleep',pic:'😴'},{w:'read',pic:'📖'},{w:'write',pic:'✍️'},{w:'sing',pic:'🎤'},{w:'play',pic:'🧸'},{w:'walk',pic:'🚶'},{w:'swim',pic:'🏊'},{w:'draw',pic:'🎨'},{w:'hop',pic:'🐰'},{w:'clap',pic:'👏'},{w:'dance',pic:'💃'},{w:'sit',pic:'🪑'}],
+"Feelings":[{w:'happy',pic:'😊'},{w:'sad',pic:'😢'},{w:'angry',pic:'😠'},{w:'scared',pic:'😨'},{w:'sleepy',pic:'😴'},{w:'excited',pic:'🤩'},{w:'shy',pic:'🙈'},{w:'proud',pic:'😌'}],
+"Nature":[{w:'sun',pic:'☀️'},{w:'rain',pic:'🌧️'},{w:'cloud',pic:'☁️'},{w:'wind',pic:'💨'},{w:'snow',pic:'❄️'},{w:'rainbow',pic:'🌈'},{w:'tree',pic:'🌳'},{w:'flower',pic:'🌸'},{w:'star',pic:'⭐'},{w:'moon',pic:'🌙'},{w:'leaf',pic:'🍃'},{w:'river',pic:'🏞️'}],
+"Transport":[{w:'car',pic:'🚗'},{w:'bus',pic:'🚌'},{w:'train',pic:'🚆'},{w:'boat',pic:'⛵'},{w:'plane',pic:'✈️'},{w:'bike',pic:'🚲'},{w:'truck',pic:'🚚'},{w:'taxi',pic:'🚕'},{w:'ship',pic:'🚢'},{w:'lorry',pic:'🚛'}],
+"Colours":[{w:'red',pic:'🔴'},{w:'blue',pic:'🔵'},{w:'green',pic:'🟢'},{w:'yellow',pic:'🟡'},{w:'orange',pic:'🟠'},{w:'purple',pic:'🟣'},{w:'pink',pic:'🩷'},{w:'black',pic:'⚫'},{w:'white',pic:'⚪'},{w:'brown',pic:'🟤'}],
+"Numbers":[{w:'one',pic:'1️⃣'},{w:'two',pic:'2️⃣'},{w:'three',pic:'3️⃣'},{w:'four',pic:'4️⃣'},{w:'five',pic:'5️⃣'},{w:'six',pic:'6️⃣'},{w:'seven',pic:'7️⃣'},{w:'eight',pic:'8️⃣'},{w:'nine',pic:'9️⃣'},{w:'ten',pic:'🔟'}],
+"Shapes":[{w:'circle',pic:'⭕'},{w:'square',pic:'🟥'},{w:'triangle',pic:'🔺'},{w:'star',pic:'⭐'},{w:'heart',pic:'❤️'},{w:'diamond',pic:'🔷'}],
+"Clothes":[{w:'shirt',pic:'👕'},{w:'shoes',pic:'👟'},{w:'hat',pic:'🎩'},{w:'socks',pic:'🧦'},{w:'dress',pic:'👗'},{w:'shorts',pic:'🩳'},{w:'jacket',pic:'🧥'},{w:'gloves',pic:'🧤'},{w:'scarf',pic:'🧣'},{w:'cap',pic:'🧢'}],
+"Family":[{w:'mum',pic:'👩'},{w:'dad',pic:'👨'},{w:'brother',pic:'👦'},{w:'sister',pic:'👧'},{w:'baby',pic:'👶'},{w:'grandma',pic:'👵'},{w:'grandpa',pic:'👴'},{w:'family',pic:'👪'}],
+"Jobs":[{w:'doctor',pic:'👨‍⚕️'},{w:'teacher',pic:'👩‍🏫'},{w:'chef',pic:'👨‍🍳'},{w:'police',pic:'👮'},{w:'nurse',pic:'👩‍⚕️'},{w:'farmer',pic:'👨‍🌾'},{w:'pilot',pic:'👨‍✈️'},{w:'baker',pic:'🧑‍🍳'}],
+"Places":[{w:'school',pic:'🏫'},{w:'home',pic:'🏠'},{w:'park',pic:'🏞️'},{w:'zoo',pic:'🦁'},{w:'shop',pic:'🏪'},{w:'market',pic:'🏬'},{w:'library',pic:'📚'},{w:'beach',pic:'🏖️'},{w:'hospital',pic:'🏥'},{w:'playground',pic:'🛝'}]
+};
+const EN_SENTENCES=[
+ {pic:'🐱🐟',hint:'"The cat eats fish."',words:['The','cat','eats','fish'],ans:['The','cat','eats','fish']},
+ {pic:'👦⚽',hint:'"I can kick the ball."',words:['I','can','kick','the','ball'],ans:['I','can','kick','the','ball']},
+ {pic:'☀️😊',hint:'"It is a sunny day."',words:['It','is','a','sunny','day'],ans:['It','is','a','sunny','day']},
+ {pic:'🐶🛏️',hint:'"The dog is on the bed."',words:['The','dog','is','on','the','bed'],ans:['The','dog','is','on','the','bed']},
+ {pic:'👧📖',hint:'"She likes to read books."',words:['She','likes','to','read','books'],ans:['She','likes','to','read','books']},
+ {pic:'🍎🧺',hint:'"I put the apple in the basket."',words:['I','put','the','apple','in','the','basket'],ans:['I','put','the','apple','in','the','basket']}
+];
+
+/* ===== HELPERS ===== */
+const $=id=>document.getElementById(id);
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show')); $(id).classList.add('show'); }
+function goHome(){ stopRec(); showScreen('home'); refreshHUD(); }
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400); }
+const ACCENTS={Chinese:['#ff6b9d','#c44b8a'],English:['#4aa3ff','#2f6bff'],Maths:['#8b5cf6','#5e3ff0'],Science:['#16c4a8','#0e9e87'],Speech:['#ff8a3d','#ff6b6b']};
+function setAccent(s){ const c=ACCENTS[s]||['#7c5cff','#5e3ff0']; document.documentElement.style.setProperty('--accent',c[0]); document.documentElement.style.setProperty('--accent2',c[1]); }
+let voices=[]; function loadVoices(){ voices=window.speechSynthesis?speechSynthesis.getVoices():[]; }
+if('speechSynthesis' in window){ loadVoices(); speechSynthesis.onvoiceschanged=loadVoices; }
+function speak(text,lang){ if(!('speechSynthesis' in window))return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang=lang||'en-US'; u.rate=(lang&&lang.startsWith('zh'))?0.6:0.85; u.pitch=1.05; const v=voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith((lang||'en').slice(0,2))); if(v)u.voice=v; speechSynthesis.speak(u); }
+function speakRepeat(text,n){ if(!('speechSynthesis' in window))return; n=n||3; speechSynthesis.cancel(); for(let i=0;i<n;i++){ const u=new SpeechSynthesisUtterance(i>0?'，'+text:text); u.lang='zh-CN'; u.rate=0.5; u.pitch=1.1; const v=voices.find(v=>v.lang&&/zh/i.test(v.lang)); if(v)u.voice=v; speechSynthesis.speak(u); } }
+function enableDrag(el,zoneSel,onDrop){ el.addEventListener('pointerdown',e=>{ if(el.classList.contains('used'))return; e.preventDefault(); const r=el.getBoundingClientRect(); const clone=el.cloneNode(true); Object.assign(clone.style,{position:'fixed',left:r.left+'px',top:r.top+'px',width:r.width+'px',zIndex:999,pointerEvents:'none',opacity:'.92',margin:0}); document.body.appendChild(clone); el.style.opacity='.3'; const ox=e.clientX-r.left,oy=e.clientY-r.top; let lz=null; const mv=ev=>{ clone.style.left=(ev.clientX-ox)+'px'; clone.style.top=(ev.clientY-oy)+'px'; const t=document.elementFromPoint(ev.clientX,ev.clientY); const z=t&&t.closest(zoneSel); if(lz&&lz!==z)lz.classList.remove('over'); if(z)z.classList.add('over'); lz=z; }; const up=ev=>{ document.removeEventListener('pointermove',mv); document.removeEventListener('pointerup',up); clone.remove(); el.style.opacity='1'; if(lz)lz.classList.remove('over'); const t=document.elementFromPoint(ev.clientX,ev.clientY); const z=t&&t.closest(zoneSel); if(z)onDrop(el,z); }; document.addEventListener('pointermove',mv); document.addEventListener('pointerup',up); }); }
+
+/* ===== SUBJECT HUB ===== */
+function openSubject(sub){
+  setAccent(sub);
+  $('subHead').textContent=({Chinese:'🐼 Chinese 中文',English:'📚 English',Maths:'🧮 Maths',Science:'🔬 Science',Speech:'🎤 Speech Buddy'})[sub];
+  const list=$('actList'); list.innerHTML='';
+  const add=(ic,nm,d,fn)=>{ const b=document.createElement('button'); b.className='act'; b.innerHTML=`<span class="ic">${ic}</span><span><div>${nm}</div><div class="d">${d}</div></span>`; b.onclick=fn; list.appendChild(b); };
+  if(sub==='Chinese'){ add('🃏','Word Cards 词语','Picture + 字 + pinyin, 🔊 & slow 🐢×3',cnOpen); add('🧩','Build Sentence 造句','Drag words into order',cbOpen); add('🎯','Match Game 游戏','Picture → tap the word',cnMatchOpen); add('👂','Listen & Find 听一听','Hear it, tap the picture',clOpen); add('🎵','Tone Practice 声调','The four Mandarin tones',toneOpen); add('🖌️','Trace Strokes 写字','Write characters on the pad',stkOpen); }
+  if(sub==='English'){ add('🃏','Word Cards','200+ words by topic, 🔊',enCardsOpen); add('🎯','Picture Match','Tap the right word',enMatchOpen); add('🧩','Build a Sentence','Drag words into order',enBuildOpen); add('✍️','Grammar Quiz','Prepositions & P1 grammar',()=>startMCQ('English',MCQ_EN,'en-US')); }
+  if(sub==='Maths'){ add('⚡','Speed Sums','Add & subtract',openSpeed); add('🧩','Number Bonds','Drag the missing number',openBonds); add('🌉','Build the Sentence','Drag numbers to make the sum',mbOpen); }
+  if(sub==='Science'){ add('🎬','Animated Demos','8 concepts, interactive',demoOpen); add('🔑','Keyword Lab','Picture + keyword + meaning',()=>startFlash('Science',DECK_SC,'en-US')); add('🎯','MCQ Practice','Exam-style questions',()=>startMCQ('Science',MCQ_SC,'en-US')); }
+  if(sub==='Speech'){ add('🎤','Read Aloud','Listen, then read & get scored',openSpeech); add('🗣️','Sound Practice','R · S · L sounds — say it & get scored',soundOpen); }
+  showScreen('subject');
+}
+
+/* ===== CHINESE: CARDS ===== */
+let cnTopic=Object.keys(TOPICS)[0],cnIdx=0,cnFlipped=false;
+function cnOpen(){ setAccent('Chinese'); bumpAct('Chinese:cards'); cnTopic=Object.keys(TOPICS)[0]; cnIdx=0; buildCnTopics(); cnRender(); showScreen('cnCards'); }
+function buildCnTopics(){ const bar=$('cnTopics'); bar.innerHTML=''; Object.keys(TOPICS).forEach(t=>{ const b=document.createElement('button'); b.className='chip'+(t===cnTopic?' active':''); b.textContent=t; b.onclick=()=>{cnTopic=t;cnIdx=0;cnFlipped=false;buildCnTopics();cnRender();}; bar.appendChild(b); }); }
+function cnRender(){ const w=TOPICS[cnTopic][cnIdx]; cnFlipped=false; $('cnFlash').classList.remove('flip'); $('cnPic').textContent=w.pic; $('cnHanzi').textContent=w.h; $('cnHanzi').style.display='block'; $('cnPy').textContent=w.p; $('cnEng').textContent=w.e; $('cnCount').textContent=(cnIdx+1)+' / '+TOPICS[cnTopic].length; }
+function cnFlip(){ cnFlipped=!cnFlipped; $('cnFlash').classList.toggle('flip',cnFlipped); $('cnHanzi').style.display=cnFlipped?'none':'block'; if(cnFlipped){ cnSpeak(); record('Chinese',true,2); } }
+function cnSpeak(){ speak(TOPICS[cnTopic][cnIdx].h,'zh-CN'); }
+function cnSpeakSlow(){ speakRepeat(TOPICS[cnTopic][cnIdx].h,3); }
+function cnNav(d){ const n=TOPICS[cnTopic].length; cnIdx=(cnIdx+d+n)%n; cnRender(); cnSpeak(); }
+
+/* ===== CHINESE: BUILD ===== */
+let cbIdx=0,cbPlaced=[];
+function cbOpen(){ setAccent('Chinese'); bumpAct('Chinese:build'); cbIdx=0; cbLoad(0); showScreen('cnBuild'); }
+function cbLoad(i){ cbIdx=i; const s=SENTENCES[i]; cbPlaced=[]; $('cbPic').textContent=s.pic; $('cbHint').textContent=s.hint; $('cbFb').textContent=''; $('cbSlots').innerHTML=''; const bank=$('cbBank'); bank.innerHTML=''; shuffle(s.words).forEach(w=>{ const b=document.createElement('button'); b.className='tile-d zh'; b.innerHTML=`${w.h}<span class="py">${w.p}</span>`; b.onclick=()=>cbPlace(b,w); enableDrag(b,'#cbSlots',(el)=>cbPlace(el,w)); bank.appendChild(b); }); }
+function cbPlace(btn,w){ if(btn.classList.contains('used'))return; btn.classList.add('used'); const slot=document.createElement('button'); slot.className='tile-d zh placed'; slot.innerHTML=`${w.h}<span class="py">${w.p}</span>`; slot.onclick=()=>{ slot.remove(); btn.classList.remove('used'); cbPlaced=cbPlaced.filter(x=>x.btn!==btn); }; $('cbSlots').appendChild(slot); cbPlaced.push({h:w.h,btn}); speak(w.h,'zh-CN'); }
+function cbCheck(){ const s=SENTENCES[cbIdx]; const got=cbPlaced.map(x=>x.h).join(''); const fb=$('cbFb'); if(got===s.ans.join('')){ fb.className='feedback good'; fb.textContent='🎉 太棒了!'; speak(s.ans.join(''),'zh-CN'); record('Chinese',true,8); confetti(); } else if(cbPlaced.length<s.ans.length){ fb.className='feedback'; fb.textContent='Keep going — add more words! 🧩'; } else { fb.className='feedback bad'; fb.textContent='Almost! Try a different order 🔄'; } }
+function cbNext(){ cbLoad((cbIdx+1)%SENTENCES.length); }
+
+/* ===== CHINESE: MATCH / LISTEN ===== */
+function allCnWords(){ return Object.values(TOPICS).flat(); }
+let cnMatchAns=null;
+function cnMatchOpen(){ setAccent('Chinese'); bumpAct('Chinese:match'); $('quizLead').innerHTML='🎯 <b>游戏</b> — tap the right Chinese word'; showScreen('quiz'); cnMatchNew(); }
+function cnMatchNew(){ const pool=allCnWords(); cnMatchAns=pool[rnd(0,pool.length-1)]; $('qPic').textContent=cnMatchAns.pic; $('qText').textContent='Which word is this?'; $('qFb').textContent=''; const opts=shuffle(pool.filter(w=>w.h!==cnMatchAns.h)).slice(0,3); opts.push(cnMatchAns); const box=$('qOpts'); box.innerHTML=''; shuffle(opts).forEach(w=>{ const b=document.createElement('button'); b.className='opt cn'; b.innerHTML=`${w.h}<span style="display:block;font-family:Nunito;font-size:13px;font-weight:700;color:var(--accent)">${w.p}</span>`; b.onclick=()=>{ speak(w.h,'zh-CN'); if(w.h===cnMatchAns.h){ b.classList.add('correct'); $('qFb').className='feedback good'; $('qFb').textContent='✅ 对了! +5'; record('Chinese',true,5); confetti(); setTimeout(cnMatchNew,1100);} else { b.classList.add('wrong'); $('qFb').className='feedback bad'; $('qFb').textContent='❌ Try again!'; record('Chinese',false);} }; box.appendChild(b); }); }
+let clAns=null;
+function clOpen(){ setAccent('Chinese'); bumpAct('Chinese:listen'); showScreen('cnListen'); clNew(); }
+function clNew(){ const pool=allCnWords(); clAns=pool[rnd(0,pool.length-1)]; $('clFb').textContent=''; const opts=shuffle(pool.filter(w=>w.h!==clAns.h)).slice(0,3); opts.push(clAns); const box=$('clOpts'); box.innerHTML=''; shuffle(opts).forEach(w=>{ const b=document.createElement('button'); b.className='opt'; b.style.fontSize='48px'; b.textContent=w.pic; b.onclick=()=>{ if(w.h===clAns.h){ b.classList.add('correct'); $('clFb').className='feedback good'; $('clFb').textContent='✅ 太好了!'; record('Chinese',true,5); confetti(); setTimeout(clNew,1200);} else { b.classList.add('wrong'); $('clFb').className='feedback bad'; $('clFb').textContent='❌ Listen again! 👂'; record('Chinese',false);} }; box.appendChild(b); }); setTimeout(()=>speak(clAns.h,'zh-CN'),300); }
+function clSpeak(){ if(clAns)speak(clAns.h,'zh-CN'); }
+
+/* ===== CHINESE: TONE / STROKE ===== */
+let tIdx=0;
+function toneOpen(){ setAccent('Chinese'); bumpAct('Chinese:tone'); tIdx=0; toneRender(); showScreen('cnTone'); }
+function toneRender(){ const t=TONES[tIdx]; $('toneNum').textContent='Tone '+t.n; $('toneNum').style.background=t.color; $('toneShape').textContent=t.arrow; $('toneShape').style.color=t.color; $('toneName').textContent=t.name; $('toneDesc').textContent=t.desc; $('tonePic').textContent=t.ex.pic; $('toneHz').textContent=t.ex.h; $('tonePyEx').textContent=t.ex.p; $('toneEn').textContent=t.ex.e; const d=$('toneDots'); d.innerHTML=''; TONES.forEach((_,i)=>{ const x=document.createElement('div'); x.className='d'+(i===tIdx?' on':''); d.appendChild(x); }); }
+function toneSpeak(){ speak(TONES[tIdx].ex.h,'zh-CN'); record('Chinese',true,2); }
+function toneNav(d){ tIdx=(tIdx+d+TONES.length)%TONES.length; toneRender(); toneSpeak(); }
+let stkIdx=0,stkCtx=null,stkDrawing=false,stkHas=false;
+function stkOpen(){ setAccent('Chinese'); bumpAct('Chinese:stroke'); stkIdx=0; stkSetup(); buildStkBar(); stkRender(); showScreen('cnStroke'); }
+function buildStkBar(){ const bar=$('stkBar'); bar.innerHTML=''; STROKES.forEach((s,i)=>{ const b=document.createElement('button'); b.className='chip zh'+(i===stkIdx?' active':''); b.textContent=s.h; b.onclick=()=>{ stkIdx=i; stkClear(); buildStkBar(); stkRender(); }; bar.appendChild(b); }); }
+function stkSetup(){ const c=$('stkCanvas'); stkCtx=c.getContext('2d'); stkCtx.lineWidth=16; stkCtx.lineCap='round'; stkCtx.lineJoin='round'; stkCtx.strokeStyle='#5e3ff0'; const pos=e=>{ const r=c.getBoundingClientRect(); const t=e.touches?e.touches[0]:e; return {x:(t.clientX-r.left)*(c.width/r.width),y:(t.clientY-r.top)*(c.height/r.height)}; }; const st=e=>{ e.preventDefault(); stkDrawing=true; stkHas=true; const p=pos(e); stkCtx.beginPath(); stkCtx.moveTo(p.x,p.y); }; const mv=e=>{ if(!stkDrawing)return; e.preventDefault(); const p=pos(e); stkCtx.lineTo(p.x,p.y); stkCtx.stroke(); }; const en=()=>{ stkDrawing=false; }; c.addEventListener('mousedown',st); c.addEventListener('mousemove',mv); window.addEventListener('mouseup',en); c.addEventListener('touchstart',st,{passive:false}); c.addEventListener('touchmove',mv,{passive:false}); c.addEventListener('touchend',en); }
+function stkRender(){ const s=STROKES[stkIdx]; $('stkGuide').textContent=s.h; $('stkLabel').textContent=s.h+' · '+s.p+' · '+s.e+'  ('+s.s+(s.s===1?' stroke':' strokes')+')'; $('stkFb').textContent=''; speak(s.h,'zh-CN'); }
+function stkClear(){ if(stkCtx)stkCtx.clearRect(0,0,280,280); stkHas=false; $('stkFb').textContent=''; }
+function stkDone(){ if(!stkHas){ $('stkFb').className='feedback bad'; $('stkFb').textContent='✍️ Trace the character first!'; return; } $('stkFb').className='feedback good'; $('stkFb').textContent='🌟 你真棒!'; speak(STROKES[stkIdx].h,'zh-CN'); record('Chinese',true,6); confetti(); setTimeout(()=>{ stkIdx=(stkIdx+1)%STROKES.length; stkClear(); buildStkBar(); stkRender(); },1400); }
+
+/* ===== GENERIC FLASH / MCQ ===== */
+let fDeck=[],fIdx=0,fSub='',fLang='',fFlip=false;
+function startFlash(sub,deck,lang){ setAccent(sub); fSub=sub; fDeck=shuffle(deck); fLang=lang; fIdx=0; bumpAct(sub+':cards'); $('flashLead').innerHTML=`🃏 <b>${sub}</b> — tap to flip, 🔊 to listen.`; renderFlash(); showScreen('flash'); }
+function renderFlash(){ const c=fDeck[fIdx]; fFlip=false; $('flashCard').classList.remove('flip'); $('flPic').textContent=c.pic; $('flFront').textContent=c.front; $('flFront').className='front'+(fLang.startsWith('en')?' en':''); $('flPy').textContent=c.py||''; $('flPy').style.display=c.py?'block':'none'; $('flBack').textContent=c.back; $('flCount').textContent=(fIdx+1)+' / '+fDeck.length; }
+function flipFlash(){ fFlip=!fFlip; $('flashCard').classList.toggle('flip',fFlip); if(fFlip){ speakFlash(); record(fSub,true,2); } }
+function speakFlash(){ speak(fDeck[fIdx].front,fLang); }
+function navFlash(d){ fIdx=(fIdx+d+fDeck.length)%fDeck.length; renderFlash(); }
+let qSet=[],qSub='',qCur=null;
+function startMCQ(sub,set,lang){ setAccent(sub); qSub=sub; qSet=set; bumpAct(sub+':quiz'); $('quizLead').innerHTML=`🎯 <b>${sub}</b> quiz`; showScreen('quiz'); nextMCQ(); }
+function nextMCQ(){ qCur=qSet[rnd(0,qSet.length-1)]; $('qPic').textContent=qCur.pic; $('qText').textContent=qCur.q; $('qFb').textContent=''; const box=$('qOpts'); box.innerHTML=''; shuffle(qCur.opts.map((o,i)=>({o,i}))).forEach(({o,i})=>{ const b=document.createElement('button'); b.className='opt'; b.textContent=o; b.onclick=()=>{ if(i===qCur.a){ b.classList.add('correct'); $('qFb').className='feedback good'; $('qFb').textContent='✅ Correct! +5'; record(qSub,true,5); confetti(); setTimeout(nextMCQ,1100);} else { b.classList.add('wrong'); $('qFb').className='feedback bad'; $('qFb').textContent='❌ Try the next one!'; record(qSub,false);} }; box.appendChild(b); }); }
+
+/* ===== ENGLISH ===== */
+let enTopic=Object.keys(EN_TOPICS)[0],enIdx=0;
+function enCardsOpen(){ setAccent('English'); bumpAct('English:cards'); enTopic=Object.keys(EN_TOPICS)[0]; enIdx=0; buildEnTopics(); enRender(); showScreen('enCards'); }
+function buildEnTopics(){ const bar=$('enTopics'); bar.innerHTML=''; Object.keys(EN_TOPICS).forEach(t=>{ const b=document.createElement('button'); b.className='chip'+(t===enTopic?' active':''); b.textContent=t; b.onclick=()=>{ enTopic=t; enIdx=0; buildEnTopics(); enRender(); }; bar.appendChild(b); }); }
+function enRender(){ const w=EN_TOPICS[enTopic][enIdx]; $('enPic').textContent=w.pic; $('enWord').textContent=w.w; $('enCount').textContent=(enIdx+1)+' / '+EN_TOPICS[enTopic].length; }
+function enSpeak(){ speak(EN_TOPICS[enTopic][enIdx].w,'en-US'); record('English',true,1); }
+function enNav(d){ const n=EN_TOPICS[enTopic].length; enIdx=(enIdx+d+n)%n; enRender(); enSpeak(); }
+function allEnWords(){ return Object.values(EN_TOPICS).flat(); }
+let enMatchAns=null;
+function enMatchOpen(){ setAccent('English'); bumpAct('English:match'); $('quizLead').innerHTML='🎯 <b>English</b> — tap the right word'; showScreen('quiz'); enMatchNew(); }
+function enMatchNew(){ const pool=allEnWords(); enMatchAns=pool[rnd(0,pool.length-1)]; $('qPic').textContent=enMatchAns.pic; $('qText').textContent='Which word is this?'; $('qFb').textContent=''; const opts=shuffle(pool.filter(w=>w.w!==enMatchAns.w)).slice(0,3); opts.push(enMatchAns); const box=$('qOpts'); box.innerHTML=''; shuffle(opts).forEach(w=>{ const b=document.createElement('button'); b.className='opt'; b.textContent=w.w; b.onclick=()=>{ speak(w.w,'en-US'); if(w.w===enMatchAns.w){ b.classList.add('correct'); $('qFb').className='feedback good'; $('qFb').textContent='✅ Yes! +5'; record('English',true,5); confetti(); setTimeout(enMatchNew,1000);} else { b.classList.add('wrong'); $('qFb').className='feedback bad'; $('qFb').textContent='❌ Try again!'; record('English',false);} }; box.appendChild(b); }); }
+let enbIdx=0,enbPlaced=[];
+function enBuildOpen(){ setAccent('English'); bumpAct('English:build'); enbIdx=0; enbLoad(0); showScreen('enBuild'); }
+function enbLoad(i){ enbIdx=i; const s=EN_SENTENCES[i]; enbPlaced=[]; $('enbPic').textContent=s.pic; $('enbHint').textContent='Make: '+s.hint; $('enbFb').textContent=''; $('enbSlots').innerHTML=''; const bank=$('enbBank'); bank.innerHTML=''; shuffle(s.words).forEach(word=>{ const b=document.createElement('button'); b.className='tile-d'; b.style.fontSize='18px'; b.textContent=word; b.onclick=()=>enbPlace(b,word); enableDrag(b,'#enbSlots',(el)=>enbPlace(el,word)); bank.appendChild(b); }); }
+function enbPlace(btn,word){ if(btn.classList.contains('used'))return; btn.classList.add('used'); const slot=document.createElement('button'); slot.className='tile-d placed'; slot.style.fontSize='18px'; slot.textContent=word; slot.onclick=()=>{ slot.remove(); btn.classList.remove('used'); enbPlaced=enbPlaced.filter(x=>x.btn!==btn); }; $('enbSlots').appendChild(slot); enbPlaced.push({word,btn}); }
+function enbCheck(){ const s=EN_SENTENCES[enbIdx]; const got=enbPlaced.map(x=>x.word).join(' '); const fb=$('enbFb'); if(got===s.ans.join(' ')){ fb.className='feedback good'; fb.textContent='🎉 Great sentence!'; speak(s.ans.join(' '),'en-US'); record('English',true,8); confetti(); } else if(enbPlaced.length<s.ans.length){ fb.className='feedback'; fb.textContent='Add more words! 🧩'; } else { fb.className='feedback bad'; fb.textContent='Almost — try a new order 🔄'; } }
+function enbNext(){ enbLoad((enbIdx+1)%EN_SENTENCES.length); }
+
+/* ===== MATHS ===== */
+let spScore=0,spTyped='',spQ=null;
+function openSpeed(){ setAccent('Maths'); bumpAct('Maths:speed'); spScore=0; $('speedScore').textContent='Score: 0'; showScreen('speed'); newSpeed(); }
+function buildKeypad(id,cb){ const k=$(id); k.innerHTML=''; ['1','2','3','4','5','6','7','8','9','del','0','go'].forEach(d=>{ const b=document.createElement('button'); b.className='key'+(d==='del'?' del':d==='go'?' go':''); b.textContent=d==='del'?'⌫':d==='go'?'✓':d; b.onclick=()=>cb(d); k.appendChild(b); }); }
+function newSpeed(){ spTyped=''; const sub=Math.random()<0.45; let a,b; if(sub){ a=rnd(2,12); b=rnd(1,a); spQ={a,b,op:'-',ans:a-b}; } else { a=rnd(1,10); b=rnd(1,10); spQ={a,b,op:'+',ans:a+b}; } $('speedEq').innerHTML=`${a} ${spQ.op} ${b} = <span class="slot" id="spSlot">_</span>`; $('speedFb').textContent=''; buildKeypad('speedKeys',d=>{ if(d==='del')spTyped=spTyped.slice(0,-1); else if(d==='go'){checkSpeed();return;} else if(spTyped.length<2)spTyped+=d; $('spSlot').textContent=spTyped||'_'; }); }
+function checkSpeed(){ if(spTyped==='')return; const ok=parseInt(spTyped,10)===spQ.ans; const fb=$('speedFb'); if(ok){ spScore++; $('speedScore').textContent='Score: '+spScore; fb.className='feedback good'; fb.textContent='✅ Correct!'; record('Maths',true,5); confetti(); setTimeout(newSpeed,800);} else { fb.className='feedback bad'; fb.textContent='❌ Answer: '+spQ.ans; record('Maths',false); spTyped=''; $('spSlot').textContent='_'; } }
+let bd=null;
+function openBonds(){ setAccent('Maths'); bumpAct('Maths:bonds'); showScreen('bonds'); newBond(); }
+const BOND_BANK=[{w:5,a:2,b:3},{w:5,a:1,b:4},{w:6,a:2,b:4},{w:6,a:3,b:3},{w:7,a:3,b:4},{w:7,a:2,b:5},{w:8,a:4,b:4},{w:8,a:3,b:5},{w:8,a:6,b:2},{w:9,a:4,b:5},{w:9,a:7,b:2},{w:9,a:6,b:3},{w:10,a:1,b:9},{w:10,a:2,b:8},{w:10,a:3,b:7},{w:10,a:4,b:6},{w:10,a:5,b:5},{w:12,a:7,b:5},{w:12,a:8,b:4},{w:13,a:6,b:7},{w:14,a:9,b:5},{w:14,a:8,b:6},{w:15,a:7,b:8},{w:15,a:9,b:6},{w:16,a:8,b:8},{w:16,a:9,b:7},{w:18,a:9,b:9},{w:20,a:10,b:10},{w:20,a:12,b:8},{w:20,a:15,b:5}];
+function newBond(){ let whole,a,b,label; if(Math.random()<0.7){ const q=BOND_BANK[rnd(0,BOND_BANK.length-1)]; whole=q.w; a=q.a; b=q.b; label=whole===10?'Make 10 ✨':whole===20?'Make 20 🚀':whole>10?'Bigger numbers to 20':'Parts make a whole'; } else { const type=rnd(0,2); if(type===0){ whole=rnd(4,10); a=rnd(1,whole-1); b=whole-a; label='Parts make a whole'; } else if(type===1){ whole=10; a=rnd(1,9); b=10-a; label='Make 10 ✨'; } else { whole=rnd(11,20); a=rnd(1,whole-1); b=whole-a; label='Bigger numbers to 20'; } } const missing=['whole','a','b'][rnd(0,2)]; bd={whole,a,b,missing,answer:missing==='whole'?whole:missing==='a'?a:b}; $('bondType').textContent=label; $('bW').textContent=missing==='whole'?'?':whole; $('bW').className='whole'; $('bW').style.cssText=missing==='whole'?'background:#fff;color:var(--accent);border:3px dashed var(--accent);box-shadow:none':''; $('bA').textContent=missing==='a'?'?':a; $('bA').className='part '+(missing==='a'?'q':'a'); $('bB').textContent=missing==='b'?'?':b; $('bB').className='part '+(missing==='b'?'q':'b'); $('bFb').textContent=''; const opts=new Set([bd.answer]); while(opts.size<4) opts.add(rnd(1,Math.max(11,whole))); const bank=$('bBank'); bank.innerHTML=''; shuffle([...opts]).forEach(v=>{ const b2=document.createElement('button'); b2.className='tile-d'; b2.textContent=v; b2.onclick=()=>bondTry(v,b2); enableDrag(b2,'.whole.q, .part.q, .whole, .part.q',(el)=>bondTry(v,b2)); bank.appendChild(b2); }); }
+function bondTry(v,btn){ const fb=$('bFb'); if(v===bd.answer){ const t=bd.missing==='whole'?$('bW'):bd.missing==='a'?$('bA'):$('bB'); t.textContent=v; t.style.cssText=''; t.className=bd.missing==='whole'?'whole':'part '+bd.missing; fb.className='feedback good'; fb.textContent=`✅ ${bd.a} + ${bd.b} = ${bd.whole}`; record('Maths',true,6); confetti(); setTimeout(newBond,1300);} else { if(btn)btn.style.background='#ffd9d9'; fb.className='feedback bad'; fb.textContent='❌ Try another!'; record('Maths',false);} }
+let mb=null;
+function mbOpen(){ setAccent('Maths'); bumpAct('Maths:build'); mbLoad(); showScreen('mathBuild'); }
+function mbLoad(){ const a=rnd(1,5),b=rnd(1,5),sum=a+b; mb={a,b,sum,slots:{A:null,B:null,C:null}}; const fr=['🍎','🍌','🍊','⭐','🐶','🌸'][rnd(0,5)]; $('mbPics').innerHTML=fr.repeat(a)+' &nbsp;+&nbsp; '+fr.repeat(b); ['mbA','mbB','mbC'].forEach(id=>{ const el=$(id); el.textContent=''; el.className='eqslot'; }); $('mbFb').textContent=''; const opts=new Set([a,b,sum]); while(opts.size<5) opts.add(rnd(1,12)); const bank=$('mbBank'); bank.innerHTML=''; shuffle([...opts]).forEach(v=>{ const t=document.createElement('button'); t.className='tile-d'; t.textContent=v; t.onclick=()=>mbPlaceNext(v,t); enableDrag(t,'.eqslot',(el,z)=>mbPlace(v,t,z)); bank.appendChild(t); }); }
+function mbPlace(v,tile,zone){ const key=zone.id==='mbA'?'A':zone.id==='mbB'?'B':'C'; if(mb.slots[key]&&mb.slots[key].tile){ mb.slots[key].tile.classList.remove('used'); } zone.textContent=v; zone.classList.add('filled'); mb.slots[key]={v,tile}; tile.classList.add('used'); }
+function mbPlaceNext(v,tile){ for(const k of ['A','B','C']){ if(!mb.slots[k]){ const zone=$('mb'+k); zone.textContent=v; zone.classList.add('filled'); mb.slots[k]={v,tile}; tile.classList.add('used'); return; } } }
+function mbCheck(){ const fb=$('mbFb'); const A=mb.slots.A&&mb.slots.A.v,B=mb.slots.B&&mb.slots.B.v,C=mb.slots.C&&mb.slots.C.v; if(A==null||B==null||C==null){ fb.className='feedback'; fb.textContent='Fill all three boxes! 🧩'; return; } if(A+B===mb.sum&&C===mb.sum){ fb.className='feedback good'; fb.textContent=`🎉 ${A} + ${B} = ${C}!`; record('Maths',true,8); confetti(); setTimeout(mbLoad,1500);} else { fb.className='feedback bad'; fb.textContent='Not quite — count the pictures again 🙂'; record('Maths',false);} }
+
+/* ===== SCIENCE DEMOS (8) ===== */
+const DEMOS=[{id:'water',name:'🌧️ Water Cycle'},{id:'heat',name:'🔥 Heat & Particles'},{id:'magnet',name:'🧲 Magnets'},{id:'shadow',name:'🌑 Light & Shadow'},{id:'plant',name:'🌱 Plant Growth'},{id:'life',name:'🦋 Life Cycle'},{id:'circuit',name:'⚡ Electric Circuit'},{id:'states',name:'🧊 States of Matter'}];
+let curDemo='water';
+function demoOpen(){ setAccent('Science'); bumpAct('Science:demo'); curDemo='water'; buildDemoBar(); renderDemo(); showScreen('sciDemo'); }
+function buildDemoBar(){ const bar=$('demoBar'); bar.innerHTML=''; DEMOS.forEach(d=>{ const b=document.createElement('button'); b.className='chip'+(d.id===curDemo?' active':''); b.textContent=d.name; b.onclick=()=>{ curDemo=d.id; buildDemoBar(); renderDemo(); }; bar.appendChild(b); }); }
+function renderDemo(){
+  const st=$('demoStage'),note=$('demoNote'),act=$('demoAction'); act.style.display='none'; act.onclick=null; record('Science',true,2);
+  if(curDemo==='water'){
+    st.innerHTML=`<div class="wc-sun">☀️</div><div class="wc-cloud">☁️</div><div class="wc-sea"></div>`+[20,38,55].map((l,i)=>`<div class="wc-vapor" style="left:${l}%;animation-delay:${i*0.8}s">💧</div>`).join('')+[62,72,82].map((l,i)=>`<div class="wc-rain" style="left:${l}%;animation-delay:${i*0.5}s">💧</div>`).join('');
+    note.innerHTML=`The sun heats the sea, so water <span class="kw">evaporates</span> into vapour and rises. Up high it cools and <span class="kw">condenses</span> into clouds. When heavy, it falls as <span class="kw">rain</span> — then repeats!`;
+  } else if(curDemo==='heat'){
+    let dots=''; for(let i=0;i<9;i++) dots+=`<div class="pdot" style="left:${15+(i%3)*30}%;top:${15+Math.floor(i/3)*30}%;animation-delay:${i*0.1}s"></div>`;
+    st.innerHTML=`<div class="pbox" id="pbox">${dots}</div>`;
+    note.innerHTML=`These dots are tiny <span class="kw">particles</span>. When they <span class="kw">gain heat</span> they move faster and spread out — the material <span class="kw">expands</span>. Tap the button!`;
+    act.style.display=''; act.textContent='🔥 Add heat'; let hot=false; act.onclick=()=>{ hot=!hot; $('pbox').classList.toggle('hot',hot); act.textContent=hot?'❄️ Cool down':'🔥 Add heat'; note.innerHTML=hot?`Particles now move <span class="kw">faster</span> and spread out — that is <span class="kw">expansion</span> from gaining heat.`:`Cooled: particles move <span class="kw">slower</span> and pack closer — that is <span class="kw">contraction</span> from losing heat.`; };
+  } else if(curDemo==='magnet'){
+    st.innerHTML=`<div class="mag left" id="m1"><div class="n">N</div><div class="s">S</div></div><div class="mag right" id="m2"><div class="n">N</div><div class="s">S</div></div>`;
+    note.innerHTML=`A magnet has two <span class="kw">poles</span>: North and South. Opposite poles <span class="kw">attract</span>; like poles <span class="kw">repel</span>. Try it!`;
+    act.style.display=''; act.textContent='🤝 Attract'; let mode=0; act.onclick=()=>{ mode=mode?0:1; const m1=$('m1'),m2=$('m2'); if(mode){ m1.style.left='150px'; m2.style.right='150px'; act.textContent='💥 Repel'; note.innerHTML=`Opposite poles face each other and <span class="kw">attract</span> — they move together.`; } else { m1.style.left='30px'; m2.style.right='30px'; act.textContent='🤝 Attract'; note.innerHTML=`Like poles face each other and <span class="kw">repel</span> — they push apart.`; } };
+  } else if(curDemo==='shadow'){
+    st.innerHTML=`<div class="sh-lamp" id="lamp" style="left:44%">💡</div><div class="sh-obj"></div><div class="sh-shadow" id="shadow" style="left:44%;width:60px"></div><input id="lampSlider" type="range" min="0" max="100" value="50" style="position:absolute;bottom:8px;left:10%;width:80%">`;
+    note.innerHTML=`The purple block is <span class="kw">opaque</span> — it blocks light. Slide the lamp 💡 and the <span class="kw">shadow</span> moves to the opposite side, because light travels in <span class="kw">straight lines</span>.`;
+    const sl=$('lampSlider'); sl.oninput=()=>{ const v=+sl.value; $('lamp').style.left=v+'%'; const off=(50-v); $('shadow').style.left=(50+off)+'%'; $('shadow').style.width=(50+Math.abs(off))+'px'; };
+  } else if(curDemo==='plant'){
+    st.innerHTML=`<div class="pl-sun">☀️</div><div class="pl-soil"></div><div class="pl-plant" id="plPlant">🌱</div>`+[36,50,64].map((l,i)=>`<div class="pl-o2" id="o2_${i}" style="left:${l}%">🫧</div>`).join('');
+    note.innerHTML=`A seed needs <span class="kw">water, air and warmth</span> to <span class="kw">germinate</span>. Add sun & water to watch it grow!`;
+    act.style.display=''; act.textContent='💧☀️ Water & sun'; let grown=false; act.onclick=()=>{ if(grown)return; grown=true; const p=$('plPlant'); p.classList.add('grown'); setTimeout(()=>p.textContent='🌻',600); [0,1,2].forEach(i=>$('o2_'+i).classList.add('go')); note.innerHTML=`Now the leaves do <span class="kw">photosynthesis</span>: using <span class="kw">sunlight</span>, <span class="kw">water</span> and carbon dioxide to make food — and give out <span class="kw">oxygen</span> 🫧.`; act.textContent='🌻 Grown!'; };
+  } else if(curDemo==='life'){
+    const stages=['🥚','🐛','🛡️','🦋'], names=['Egg','Caterpillar (larva)','Pupa (chrysalis)','Butterfly (adult)']; let i=0;
+    const draw=()=>{ st.innerHTML=`<div class="lc-name">${names[i]}</div><div class="lc-ring"><div class="lc-stage">${stages[i]}</div></div><div class="lc-steps">${stages.map((s,k)=>`<span class="s${k===i?' on':''}">${s}</span>`).join('')}</div>`; };
+    draw(); note.innerHTML=`A butterfly changes shape as it grows — this is called <span class="kw">metamorphosis</span>. The order is egg → larva → pupa → adult, then it repeats. Tap to go to the next stage.`;
+    act.style.display=''; act.textContent='Next stage ➜'; act.onclick=()=>{ i=(i+1)%4; draw(); if(i===0)confetti(); };
+  } else if(curDemo==='circuit'){
+    st.innerHTML=`<div class="ct-wrap"><div><div class="ct-bulb" id="ctBulb">💡</div><div class="ct-circuit" id="ctLine">🔋 ⎯⎯ ✂️ ⎯⎯</div></div></div>`;
+    note.innerHTML=`Electricity only flows around a <span class="kw">closed circuit</span>. If there is a gap (an <span class="kw">open circuit</span>), the bulb stays off. Tap to close the switch!`;
+    act.style.display=''; act.textContent='🔌 Close switch'; let on=false; act.onclick=()=>{ on=!on; $('ctBulb').classList.toggle('on',on); $('ctLine').textContent=on?'🔋 ⎯⎯ 🔘 ⎯⎯':'🔋 ⎯⎯ ✂️ ⎯⎯'; act.textContent=on?'🔓 Open switch':'🔌 Close switch'; note.innerHTML=on?`The circuit is <span class="kw">closed</span> — current flows in a loop and the bulb lights up! 💡`:`The circuit is <span class="kw">open</span> — there is a gap, so no current flows and the bulb is off.`; if(on)confetti(); };
+  } else if(curDemo==='states'){
+    const layouts={ solid:[[30,55],[44,55],[58,55],[30,69],[44,69],[58,69],[30,41],[44,41],[58,41]], liquid:[[24,62],[40,68],[56,64],[70,70],[30,78],[48,80],[64,78],[38,56],[58,56]], gas:[[18,30],[40,18],[66,26],[80,50],[22,62],[50,52],[74,72],[34,80],[60,82]] };
+    const order=['solid','liquid','gas'], names={solid:'Solid 🧊',liquid:'Liquid 💧',gas:'Gas 💨'}; let si=0;
+    const draw=()=>{ const L=layouts[order[si]]; st.innerHTML=`<div class="st-box"><div class="st-label">${names[order[si]]}</div>`+L.map((p,k)=>`<div class="st-dot" id="sd_${k}" style="left:${p[0]}%;top:${p[1]}%"></div>`).join('')+`</div>`; };
+    draw(); const notes={solid:`In a <span class="kw">solid</span>, particles are packed tightly in a fixed shape and only vibrate.`,liquid:`In a <span class="kw">liquid</span>, particles are close but can slide — so it flows and takes the shape of its container.`,gas:`In a <span class="kw">gas</span>, particles spread far apart and move freely to fill all the space.`};
+    note.innerHTML=notes.solid+` Adding heat can <span class="kw">melt</span> a solid, then <span class="kw">evaporate</span> a liquid.`;
+    act.style.display=''; act.textContent='🔥 Add heat ➜ next state'; act.onclick=()=>{ si=(si+1)%3; draw(); note.innerHTML=notes[order[si]]; if(order[si]==='gas')confetti(); };
+  }
+}
+
+/* ===== SPEECH ===== */
+let spLang='en',spItems=SPEECH_EN,spItemIdx=0,recog=null,recording=false;
+function openSpeech(){ setAccent('Speech'); bumpAct('Speech:read'); setSpeechLang('en'); showScreen('speech'); }
+function setSpeechLang(l){ spLang=l; $('spEn').classList.toggle('on',l==='en'); $('spCn').classList.toggle('on',l==='zh'); spItems=l==='en'?SPEECH_EN:SPEECH_CN; spItemIdx=rnd(0,spItems.length-1); renderSpeech(); }
+function renderSpeech(){ $('spText').textContent=spItems[spItemIdx]; $('spText').className='speech-text'+(spLang==='zh'?' cn':''); $('spHeard').textContent='Tap 🎤 and read the sentence'; $('spFb').textContent=''; $('spScoreFill').style.width='0'; }
+function speakSpeech(){ speak(spItems[spItemIdx], spLang==='zh'?'zh-CN':'en-US'); }
+function nextSpeech(){ spItemIdx=(spItemIdx+1)%spItems.length; renderSpeech(); }
+function stopRec(){ if(recog){ try{recog.stop();}catch(e){} } recording=false; const m=$('micBtn'); if(m)m.classList.remove('rec'); }
+function recordSpeech(){ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR){ $('spHeard').textContent="Speech recognition isn't supported here — use self-rate."; selfRate(); return; } if(recording){ stopRec(); return; } recog=new SR(); recog.lang=spLang==='zh'?'zh-CN':'en-US'; recog.interimResults=false; recording=true; $('micBtn').classList.add('rec'); $('spHeard').textContent='🎙️ Listening… read now!'; recog.onresult=e=>scoreSpeech(e.results[0][0].transcript); recog.onerror=()=>{ $('spHeard').textContent="Didn't catch that — try again or self-rate."; stopRec(); selfRate(); }; recog.onend=()=>stopRec(); try{ recog.start(); }catch(e){ stopRec(); } }
+function norm(s){ return s.toLowerCase().replace(/[.,!?，。！？]/g,'').trim(); }
+function scoreSpeech(said){ stopRec(); $('spHeard').textContent='You said: "'+said+'"'; const target=spItems[spItemIdx]; let score; if(spLang==='zh'){ const t=norm(target).replace(/\s/g,'').split(''),h=new Set(norm(said).replace(/\s/g,'').split('')); let m=0; t.forEach(c=>{if(h.has(c))m++;}); score=Math.round(m/t.length*100); } else { const t=norm(target).split(/\s+/),h=new Set(norm(said).split(/\s+/)); let m=0; t.forEach(w=>{if(h.has(w))m++;}); score=Math.round(m/t.length*100); } $('spScoreFill').style.width=score+'%'; const fb=$('spFb'); if(score>=80){ fb.className='feedback good'; fb.textContent='🌟 '+score+'% — Excellent!'; record('Speech',true,8); confetti(); } else if(score>=50){ fb.className='feedback good'; fb.textContent='🙂 '+score+'% — Good try!'; record('Speech',true,4); } else { fb.className='feedback bad'; fb.textContent='💪 '+score+'% — Listen 🔊 and try again.'; record('Speech',false); } }
+function selfRate(){ $('spFb').className='feedback'; $('spFb').innerHTML='How did you do?<div class="row" style="margin-top:8px"><button class="action-btn b-clear" onclick="manualRate(0)">😵 Tricky</button><button class="action-btn b-go" onclick="manualRate(1)">🙂 Okay</button><button class="action-btn b-next" onclick="manualRate(2)">😎 Great</button></div>'; }
+function manualRate(s){ $('spScoreFill').style.width=[40,70,100][s]+'%'; record('Speech',s>0,[2,5,8][s]); if(s===2)confetti(); $('spFb').className='feedback good'; $('spFb').textContent='Saved! Keep practising 🎤'; }
+
+/* ===== SPEECH: SOUND PRACTICE ===== */
+let curSound='R',sndIdx=0;
+function soundOpen(){ setAccent('Speech'); bumpAct('Speech:sound'); curSound=Object.keys(SOUNDS)[0]; sndIdx=0; buildSoundTabs(); soundRender(); showScreen('soundPlay'); }
+function buildSoundTabs(){ const bar=$('sndTabs'); bar.innerHTML=''; Object.keys(SOUNDS).forEach(k=>{ const b=document.createElement('button'); b.className='chip'+(k===curSound?' active':''); b.textContent=k+' sound'; b.onclick=()=>{ curSound=k; sndIdx=0; buildSoundTabs(); soundRender(); }; bar.appendChild(b); }); }
+function sndHl(word,snd){ const i=word.toLowerCase().indexOf(snd.toLowerCase()); if(i<0)return word; return word.slice(0,i)+'<span style="color:var(--accent)">'+word.slice(i,i+snd.length)+'</span>'+word.slice(i+snd.length); }
+function soundRender(){ const item=SOUNDS[curSound].words[sndIdx]; $('sndPic').textContent=item.pic; $('sndWord').innerHTML=sndHl(item.w,curSound); $('sndCount').textContent=(sndIdx+1)+' / '+SOUNDS[curSound].words.length; $('sndHeard').textContent='Tap 🔊 to hear it, then 🎤 to say it'; $('sndFb').textContent=''; }
+function soundSpeak(){ speak(SOUNDS[curSound].words[sndIdx].w,'en-US'); }
+function soundNav(d){ const n=SOUNDS[curSound].words.length; sndIdx=(sndIdx+d+n)%n; soundRender(); soundSpeak(); }
+function soundTwister(){ const tw=SOUNDS[curSound].twister; $('sndHeard').textContent='🌀 '+tw; speak(tw,'en-US'); record('Speech',true,2); }
+function soundRecord(){ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR){ $('sndHeard').textContent="Speech recognition isn't supported here — use self-rate."; sndSelfRate(); return; } if(recording){ try{recog.stop();}catch(e){} recording=false; $('sndMic').classList.remove('rec'); return; } recog=new SR(); recog.lang='en-US'; recog.interimResults=false; recording=true; $('sndMic').classList.add('rec'); $('sndHeard').textContent='🎙️ Say the word!'; recog.onresult=e=>sndScore(e.results[0][0].transcript); recog.onerror=()=>{ $('sndHeard').textContent="Didn't catch that — try again or self-rate."; recording=false; $('sndMic').classList.remove('rec'); sndSelfRate(); }; recog.onend=()=>{ recording=false; const m=$('sndMic'); if(m)m.classList.remove('rec'); }; try{recog.start();}catch(e){ recording=false; $('sndMic').classList.remove('rec'); } }
+function sndScore(said){ try{recog.stop();}catch(e){} recording=false; $('sndMic').classList.remove('rec'); said=(said||'').toLowerCase(); const target=SOUNDS[curSound].words[sndIdx].w.toLowerCase(); $('sndHeard').textContent='You said: "'+said+'"'; const fb=$('sndFb'); if(said.includes(target)){ fb.className='feedback good'; fb.textContent='🌟 Perfect — I heard "'+target+'"!'; record('Speech',true,6); confetti(); } else if(said.includes(curSound.toLowerCase())){ fb.className='feedback good'; fb.textContent='🙂 Good — keep practising the '+curSound+' sound!'; record('Speech',true,3); } else { fb.className='feedback bad'; fb.textContent='💪 Listen 🔊 and try the '+curSound+' sound again.'; record('Speech',false); } }
+function sndSelfRate(){ $('sndFb').className='feedback'; $('sndFb').innerHTML='How did it sound?<div class="row" style="margin-top:8px"><button class="action-btn b-clear" onclick="sndManual(0)">😵 Tricky</button><button class="action-btn b-go" onclick="sndManual(1)">🙂 Okay</button><button class="action-btn b-next" onclick="sndManual(2)">😎 Great</button></div>'; }
+function sndManual(s){ record('Speech',s>0,[2,4,6][s]); if(s===2)confetti(); $('sndFb').className='feedback good'; $('sndFb').textContent='Saved! 🎤'; }
+
+/* ===== PROGRESS + TEACHER VIEW ===== */
+let progView='mine', classRows=[];
+async function openProgress(){ showScreen('progress'); setAccent('Maths'); progView='mine'; DB=await dbLoad()||DB; drawProgress(); }
+function setProgView(v){ progView=v; drawProgress(); }
+function drawProgress(){ const body=$('progBody'); body.innerHTML=`<div class="row" style="margin-bottom:12px"><button class="chip ${progView==='mine'?'active':''}" onclick="setProgView('mine')">👤 ${STUDENT}</button><button class="chip ${progView==='class'?'active':''}" onclick="setProgView('class')">👩‍🏫 Teacher view</button></div><div id="progInner"></div>`; if(progView==='mine') renderMine(); else renderClass(); }
+function renderMine(){
+  const inner=$('progInner'); if(!DB){ inner.innerHTML='<div class="loading">Loading…</div>'; return; }
+  const dates=Object.keys(DB.sessions).sort().slice(-7); let totQ=0,totC=0; Object.values(DB.sessions).forEach(s=>{totQ+=s.total;totC+=s.correct;}); const acc=totQ?Math.round(totC/totQ*100):0;
+  let html=`<div class="sub-head">📈 ${STUDENT}'s Progress</div>`;
+  html+=`<div class="stat-grid"><div class="stat"><div class="v">${DB.xp}</div><div class="l">⭐ XP</div></div><div class="stat"><div class="v">${DB.streak}🔥</div><div class="l">Streak</div></div><div class="stat"><div class="v">${acc}%</div><div class="l">Accuracy (${totC}/${totQ})</div></div><div class="stat"><div class="v">${totQ}</div><div class="l">Questions</div></div></div>`;
+  html+=`<div class="chart-card"><h3>📊 Last 7 active days</h3>`;
+  if(dates.length){ html+=`<div class="bars">`; dates.forEach(d=>{ const s=DB.sessions[d]; const p=s.total?Math.round(s.correct/s.total*100):0; html+=`<div class="bar-col"><div class="pct">${p}%</div><div class="gbar" style="height:${Math.max(6,p)}%"></div><div class="lab">${d.slice(5)}</div></div>`; }); html+=`</div>`; } else html+=`<div class="empty">Play a game to grow your chart! 🌱</div>`; html+=`</div>`;
+  html+=`<div class="chart-card"><h3>🧠 Mastery by subject</h3>`; let any=false; SUBJECTS.forEach(sub=>{ const s=DB.subjects[sub]||{c:0,t:0}; if(s.t>0){ any=true; const p=Math.round(s.c/s.t*100); html+=`<div class="mastery-row"><div class="nm">${EMOJI[sub]} ${sub}</div><div class="mtrack"><div class="mfill" style="width:${p}%"></div></div><div class="mp">${p}%</div></div>`; } }); if(!any) html+=`<div class="empty">No subject data yet.</div>`; html+=`</div>`;
+  html+=`<button class="reset" onclick="resetProgress()">Reset ${STUDENT}'s progress</button><div class="syncline">Saving to: ${SYNC}</div>`;
+  inner.innerHTML=html;
+}
+async function renderClass(){
+  const inner=$('progInner'); inner.innerHTML='<div class="loading">Loading class… ⏳</div>';
+  const roster=await rosterGet();
+  if(!roster.length){ inner.innerHTML='<div class="empty">No students saved yet. Each child who plays (set name with 👤) appears here automatically.</div>'; return; }
+  const datas=await Promise.all(roster.map(n=>apiGet(n)));
+  const rows=roster.map((n,i)=>{ const d=datas[i]||blankDB(); let q=0,c=0; Object.values(d.sessions||{}).forEach(s=>{q+=s.total;c+=s.correct;}); return {name:n,xp:d.xp||0,streak:d.streak||0,acc:q?Math.round(c/q*100):0,q,subjects:d.subjects||{}}; }).sort((a,b)=>b.xp-a.xp);
+  classRows=rows;
+  let html=`<div class="sub-head">👩‍🏫 Class (${rows.length})</div>`;
+  html+=`<div class="row" style="margin-bottom:12px"><button class="action-btn b-ok" onclick="exportClassCSV()">⬇️ Download CSV</button><button class="action-btn b-go" onclick="printClassReport()">🖨️ Print report</button></div>`;
+  html+=`<div class="chart-card"><h3>📊 Accuracy by student</h3><div class="bars">`;
+  rows.forEach(r=>{ html+=`<div class="bar-col"><div class="pct">${r.acc}%</div><div class="gbar" style="height:${Math.max(6,r.acc)}%"></div><div class="lab">${r.name.slice(0,6)}</div></div>`; });
+  html+=`</div></div>`;
+  rows.forEach((r,idx)=>{ html+=`<div class="chart-card"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h3 style="margin:0">${idx+1}. ${r.name}</h3><div style="font-weight:900;color:var(--mute);font-size:12px">⭐${r.xp} · ${r.streak}🔥 · ${r.acc}%</div></div><div style="margin-top:8px">`;
+    let any=false; SUBJECTS.forEach(sub=>{ const s=r.subjects[sub]||{c:0,t:0}; if(s.t>0){ any=true; const p=Math.round(s.c/s.t*100); html+=`<div class="mastery-row"><div class="nm">${EMOJI[sub]} ${sub}</div><div class="mtrack"><div class="mfill" style="width:${p}%"></div></div><div class="mp">${p}%</div></div>`; } });
+    if(!any) html+=`<div class="empty">No data yet</div>`;
+    html+=`</div><button class="action-btn b-go" style="margin-top:8px" data-open="${idx}">Open as ${r.name}</button></div>`; });
+  inner.innerHTML=html;
+  inner.querySelectorAll('[data-open]').forEach(btn=>{ btn.onclick=()=>openAsStudent(rows[+btn.dataset.open].name); });
+}
+async function openAsStudent(name){ STUDENT=name; try{ localStorage.setItem('buddy:current',name); }catch(e){} $('studentName').textContent=name; DB=await dbLoad()||blankDB(); refreshHUD(); progView='mine'; drawProgress(); toast('Viewing '+name); }
+function csvEsc(v){ v=(''+v).replace(/"/g,'""'); return /[",\n]/.test(v)?`"${v}"`:v; }
+function exportClassCSV(){
+  if(!classRows.length){ toast('No students yet'); return; }
+  const header=['Student','XP','Streak','Accuracy %','Questions',...SUBJECTS.map(s=>s+' %')];
+  const lines=[header.join(',')];
+  classRows.forEach(r=>{ const row=[r.name,r.xp,r.streak,r.acc,r.q,...SUBJECTS.map(s=>{ const x=r.subjects[s]||{c:0,t:0}; return x.t?Math.round(x.c/x.t*100):''; })]; lines.push(row.map(csvEsc).join(',')); });
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='class-report-'+todayStr()+'.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); toast('CSV downloaded');
+}
+function printClassReport(){
+  if(!classRows.length){ toast('No students yet'); return; }
+  const rowsHtml=classRows.map((r,i)=>{ const subs=SUBJECTS.map(s=>{ const x=r.subjects[s]||{c:0,t:0}; return '<td>'+(x.t?Math.round(x.c/x.t*100)+'%':'–')+'</td>'; }).join(''); return `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.xp}</td><td>${r.streak}</td><td>${r.acc}%</td><td>${r.q}</td>${subs}</tr>`; }).join('');
+  const w=window.open('','_blank'); if(!w){ toast('Allow pop-ups to print'); return; }
+  w.document.write(`<html><head><title>Class Report ${todayStr()}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#26304f}h1{font-size:20px;margin:0}p{color:#6b7393;font-size:12px}table{border-collapse:collapse;width:100%;margin-top:14px}th,td{border:1px solid #ccc;padding:8px;text-align:center;font-size:13px}th{background:#7c5cff;color:#fff}td:nth-child(2){text-align:left;font-weight:bold}</style></head><body><h1>Learning Buddy — Class Report</h1><p>Generated ${new Date().toLocaleString()}</p><table><thead><tr><th>#</th><th>Student</th><th>XP</th><th>Streak</th><th>Accuracy</th><th>Questions</th>${SUBJECTS.map(s=>'<th>'+s+'</th>').join('')}</tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`);
+  w.document.close(); setTimeout(()=>w.print(),300);
+}
+async function resetProgress(){ if(!confirm("Erase "+STUDENT+"'s saved progress?"))return; DB=blankDB(); DB.lastDay=todayStr(); DB.streak=1; await dbSave(DB); refreshHUD(); drawProgress(); toast('Progress reset'); }
+
+/* ===== FX ===== */
+function addXpFx(){ const p=$('xp'); p.animate([{transform:'scale(1)'},{transform:'scale(1.4)'},{transform:'scale(1)'}],{duration:300}); }
+function confetti(){ const colors=['#7c5cff','#ff6b9d','#4aa3ff','#16c4a8','#ffc233','#ff8a3d']; for(let i=0;i<22;i++){ const c=document.createElement('div'); c.className='confetti'; c.style.left=Math.random()*100+'vw'; c.style.background=colors[i%colors.length]; document.body.appendChild(c); c.animate([{transform:'translateY(0) rotate(0)',opacity:1},{transform:`translateY(110vh) rotate(${720*(Math.random()>.5?1:-1)}deg)`,opacity:.9}],{duration:900+Math.random()*800,easing:'ease-in'}).onfinish=()=>c.remove(); } }
+
+/* ===== INIT ===== */
+initDB();
+</script>
+</body>
+                                                                                                                             </html>
