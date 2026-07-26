@@ -1,0 +1,10 @@
+{
+  "name": "speechbloom",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "SpeechBloom – Learning Buddy for kids covering Chinese, English, Maths, Science and Speech.",
+  "dependencies": {
+    "@vercel/kv": "^3.0.0"
+  }
+}
